@@ -242,7 +242,6 @@
             margin-top: 1.5rem;
             margin-bottom: 0.5rem;
             color: var(--text-secondary);
-            text-transform: uppercase;
             letter-spacing: 0.02em;
         }
         p { margin-bottom: 1rem; color: var(--text-secondary); }
@@ -2987,6 +2986,9 @@ var products = context.Products
     .ToList();
 \`\`\`
 
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- 1️⃣ Include(p => p.Category) — tekil referans, her satır = 1 ürün
 -- ⚡ ORDER BY yok: Category reference navigation (1:1 eşleşme, gruplama gereksiz)
@@ -2996,6 +2998,20 @@ FROM [Products] AS [p]
 INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id];
 \`\`\`
 
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- 1️⃣ Include(p => p.Category) — tekil referans, her satır = 1 ürün
+SELECT p.id, p.name, p.price, p.category_id,
+       c.id, c.name
+FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id;
+\`\`\`
+
+</details>
+
 \`\`\`csharp
 // 2️⃣ İç içe ilişki (Nested Include) — Kategori → Ürünler → Taglar
 var categories = context.Categories
@@ -3003,6 +3019,9 @@ var categories = context.Categories
         .ThenInclude(p => p.Tags)
     .ToList();
 \`\`\`
+
+<details open>
+<summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
 -- 2️⃣ Include + ThenInclude (iki seviye JOIN)
@@ -3016,12 +3035,32 @@ LEFT JOIN [Tags] AS [t] ON [t].[ProductId] = [p].[Id]
 ORDER BY [c].[Id], [p].[Id];
 \`\`\`
 
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- 2️⃣ Include + ThenInclude (iki seviye JOIN)
+SELECT c.id, c.name,
+       p.id, p.name, p.category_id,
+       t.id, t.name, t.product_id
+FROM categories AS c
+LEFT JOIN products AS p ON p.category_id = c.id
+LEFT JOIN tags AS t ON t.product_id = p.id
+ORDER BY c.id, p.id;
+\`\`\`
+
+</details>
+
 \`\`\`csharp
 // 3️⃣ Filtrelenmiş Include (EF Core 5+) — sadece aktif ürünleri çek
 var categories = context.Categories
     .Include(c => c.Products.Where(p => p.IsActive))
     .ToList();
 \`\`\`
+
+<details open>
+<summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
 -- 3️⃣ Filtered Include — WHERE koşulu JOIN'a eklenir
@@ -3032,6 +3071,21 @@ LEFT JOIN [Products] AS [p] ON [p].[CategoryId] = [c].[Id] AND [p].[IsActive] = 
 ORDER BY [c].[Id];
 \`\`\`
 
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- 3️⃣ Filtered Include — WHERE koşulu JOIN'a eklenir
+SELECT c.id, c.name,
+       p.id, p.name, p.category_id, p.is_active
+FROM categories AS c
+LEFT JOIN products AS p ON p.category_id = c.id AND p.is_active = TRUE
+ORDER BY c.id;
+\`\`\`
+
+</details>
+
 \`\`\`csharp
 // 4️⃣ Birden fazla Include — Ürün + Kategori + Tedarikçi
 var products = context.Products
@@ -3040,6 +3094,9 @@ var products = context.Products
     .Where(p => p.Price > 100)
     .ToList();
 \`\`\`
+
+<details open>
+<summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
 -- 4️⃣ Çoklu Include — her biri ayrı JOIN
@@ -3051,6 +3108,23 @@ INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id]
 INNER JOIN [Suppliers] AS [s] ON [p].[SupplierId] = [s].[Id]
 WHERE [p].[Price] > 100.0;
 \`\`\`
+
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- 4️⃣ Çoklu Include — her biri ayrı JOIN
+SELECT p.id, p.name, p.price, p.category_id, p.supplier_id,
+       c.id, c.name,
+       s.id, s.company_name
+FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id
+INNER JOIN suppliers AS s ON p.supplier_id = s.id
+WHERE p.price > 100.0;
+\`\`\`
+
+</details>
 
 ---
 
@@ -3066,6 +3140,9 @@ context.Entry(product)
        .Load();
 \`\`\`
 
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- İlk sorgu:
 SELECT TOP(1) [p].[Id], [p].[Name], [p].[CategoryId]
@@ -3078,15 +3155,39 @@ FROM [Categories] AS [c]
 WHERE [c].[Id] = @categoryId;   -- product.CategoryId değeri
 \`\`\`
 
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- İlk sorgu:
+SELECT p.id, p.name, p.category_id
+FROM products AS p
+WHERE p.id = 1
+LIMIT 1;
+
+-- .Load() çağrıldığında (ayrı sorgu):
+SELECT c.id, c.name
+FROM categories AS c
+WHERE c.id = @categoryId;
+\`\`\`
+
+</details>
+
 \`\`\`csharp
 // 2️⃣ Koleksiyon navigation (Collection) — filtreleme ile
-var category = context.Categories.First(c => c.Id == 1);
+var category = context.Categories.First(c => c.Id == 1);  // 1. sorgu: Category
 context.Entry(category)
        .Collection(c => c.Products)
        .Query()                              // IQueryable döner — filtrelenebilir!
        .Where(p => p.Price > 500)
-       .Load();
+       .Load();                              // 2. sorgu: filtrelenmiş Products
 \`\`\`
+
+> ⚠️ **2 ayrı sorgu çalışır:** İlk satır Category'yi, \`.Load()\` ise Products'ı getirir. Bu Explicit Loading'in tasarımı gereğidir — avantajı ikinci sorguda \`.Where()\` ile filtreleme yapabilmenizdir (Eager Loading'de tüm ilişkili veri gelir).
+
+<details open>
+<summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
 -- .Query().Where(...).Load()
@@ -3095,11 +3196,24 @@ FROM [Products] AS [p]
 WHERE [p].[CategoryId] = @categoryId AND [p].[Price] > 500.0;
 \`\`\`
 
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- .Query().Where(...).Load()
+SELECT p.id, p.name, p.price, p.category_id
+FROM products AS p
+WHERE p.category_id = @categoryId AND p.price > 500.0;
+\`\`\`
+
+</details>
+
 ---
 
 ### Lazy Loading (Tembel Yükleme)
 
-**Navigation property'ye erişildiğinde** otomatik yükler. Performans riski yüksek!
+**Navigation property'ye erişildiğinde** otomatik yükler. ⚠️ **N+1 sorgu tehlikesi — production'da dikkatli kullan!**
 
 \`\`\`csharp
 // 1. NuGet: Microsoft.EntityFrameworkCore.Proxies
@@ -3118,12 +3232,28 @@ var product = context.Products.First();
 var categoryName = product.Category.Name;  // ← Burada SELECT çalışır!
 \`\`\`
 
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- product.Category.Name erişildiğinde arka planda:
 SELECT [c].[Id], [c].[Name]
 FROM [Categories] AS [c]
 WHERE [c].[Id] = @categoryId;
 \`\`\`
+
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- product.Category.Name erişildiğinde arka planda:
+SELECT c.id, c.name
+FROM categories AS c
+WHERE c.id = @categoryId;
+\`\`\`
+
+</details>
 
 > ⚠️ **N+1 Problemi — Lazy Loading'in tehlikesi:**
 > \`\`\`csharp
@@ -3134,11 +3264,19 @@ WHERE [c].[Id] = @categoryId;
 > \`\`\`
 >
 > \`\`\`sql
-> -- Döngüdeki her iterasyon için ayrı sorgu:
+> -- Döngüdeki her iterasyon için ayrı sorgu (SQL Server):
 > SELECT * FROM Products;                                    -- 1. sorgu
 > SELECT * FROM Categories WHERE Id = 1;                    -- 2. sorgu
 > SELECT * FROM Categories WHERE Id = 2;                    -- 3. sorgu
 > SELECT * FROM Categories WHERE Id = 1;                    -- 4. (aynı bile olsa!)
+> -- ... 100 ürün = 101 sorgu!
+> \`\`\`
+> \`\`\`sql
+> -- Döngüdeki her iterasyon için ayrı sorgu (PostgreSQL):
+> SELECT * FROM products;                                    -- 1. sorgu
+> SELECT * FROM categories WHERE id = 1;                    -- 2. sorgu
+> SELECT * FROM categories WHERE id = 2;                    -- 3. sorgu
+> SELECT * FROM categories WHERE id = 1;                    -- 4. (aynı bile olsa!)
 > -- ... 100 ürün = 101 sorgu!
 > \`\`\`
 >
@@ -3158,12 +3296,34 @@ var orders = context.Orders
     .ToList();
 \`\`\`
 
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- AsSplitQuery: ayrı ayrı sorgular
 SELECT [o].* FROM [Orders] AS [o];
 SELECT [l].* FROM [OrderLineItems] AS [l] WHERE [l].[OrderId] IN (...);
 SELECT [p].* FROM [Payments] AS [p] WHERE [p].[OrderId] IN (...);
 \`\`\`
+
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- AsSplitQuery: ayrı ayrı sorgular
+SELECT o.* FROM orders AS o;
+SELECT l.* FROM order_line_items AS l WHERE l.order_id = ANY(@orderIds);
+SELECT p.* FROM payments AS p WHERE p.order_id = ANY(@orderIds);
+\`\`\`
+
+</details>
+
+> ⚠️ **\`IN (...)\` parametre limiti:** EF Core, ilk sorgudan dönen **tüm PK değerlerini** \`IN\` listesine koyar.
+> - SQL Server: max **2.100 parametre** → ~2.100 order'dan fazlası varsa EF otomatik olarak geçici tablo veya alt sorgu kullanır (EF Core 8+)
+> - PostgreSQL: max **65.535 parametre** — daha rahat ama yine de dikkat
+> - **1M kayıt** gibi büyük veri setlerinde: \`AsSplitQuery()\` yerine **pagination** (\`Skip/Take\`) + \`Include\` veya **Projection** (\`Select\`) kullan
+> - En güvenli yaklaşım: Filtresiz tüm tabloyu çekmek yerine \`WHERE\` ile daralt, sonra \`AsSplitQuery()\` uygula
 
 **Single Query vs Split Query — Trade-off:**
 
@@ -3212,6 +3372,9 @@ var result = context.Products
     .ToList();
 \`\`\`
 
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Projection: Include yazmana gerek yok, EF navigation'ı otomatik JOIN'a çevirir
 SELECT [p].[Id], [p].[Name], [c].[Name] AS [CategoryName]
@@ -3220,6 +3383,21 @@ INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id]
 WHERE [p].[IsActive] = CAST(1 AS bit);
 -- ✅ Sadece 3 sütun çekilir (tüm tablo değil)
 \`\`\`
+
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Projection: Include yazmana gerek yok, EF navigation'ı otomatik JOIN'a çevirir
+SELECT p.id, p.name, c.name AS category_name
+FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id
+WHERE p.is_active = TRUE;
+-- ✅ Sadece 3 sütun çekilir (tüm tablo değil)
+\`\`\`
+
+</details>
 
 > 💡 **JOIN üretimi için DB'de FK constraint olması şart mı?**
 >
@@ -3597,16 +3775,141 @@ context.Entry(product).Property(p => p.Price).IsModified = true;
 ### Salt Okunur Sorgular (AsNoTracking)
 
 \`\`\`csharp
-// Salt okunur sorgular (tracking kapalı — daha hızlı)
+// ✅ Salt okunur sorgular (tracking kapalı — daha hızlı)
 var products = context.Products
     .AsNoTracking()
     .Where(p => p.IsActive)
     .ToList();
+// SaveChanges() çağırsan bile bu entity'ler güncellenmez — read-only!
+\`\`\`
 
-// Identity resolution olmadan (en hızlı — aynı entity farklı instance olabilir)
-var products = context.Products
-    .AsNoTrackingWithIdentityResolution()  // Aynı entity = aynı instance, ama track yok
-    .Include(p => p.Category)
+#### AsNoTracking vs AsNoTrackingWithIdentityResolution
+
+**Problem:** \`AsNoTracking()\` ile aynı entity birden fazla satırda gelirse, her biri **ayrı C# nesnesi** olur:
+
+\`\`\`csharp
+// ❌ AsNoTracking — aynı Category, farklı instance'lar
+var orders = context.Orders
+    .AsNoTracking()
+    .Include(o => o.Customer)
+    .ToList();
+
+// Order #1 → Customer { Id=5, Name="Ali" }   ← instance A (0x1A2B)
+// Order #2 → Customer { Id=5, Name="Ali" }   ← instance B (0x3C4D)  FARKLI obje!
+// Order #3 → Customer { Id=5, Name="Ali" }   ← instance C (0x5E6F)  YİNE FARKLI!
+
+Console.WriteLine(orders[0].Customer == orders[1].Customer);  // FALSE
+// Bellek: 3 ayrı Customer nesnesi (aynı veri, 3x bellek)
+\`\`\`
+
+\`\`\`csharp
+// ✅ AsNoTrackingWithIdentityResolution — aynı PK = aynı instance
+var orders = context.Orders
+    .AsNoTrackingWithIdentityResolution()
+    .Include(o => o.Customer)
+    .ToList();
+
+// Order #1 → Customer { Id=5, Name="Ali" }   ← instance A (0x1A2B)
+// Order #2 → ↗ aynı instance A'yı referans eder
+// Order #3 → ↗ aynı instance A'yı referans eder
+
+Console.WriteLine(orders[0].Customer == orders[1].Customer);  // TRUE ✅
+// Bellek: Sadece 1 Customer nesnesi (3 order aynı referansı paylaşır)
+\`\`\`
+
+<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" style="max-width:720px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+<defs>
+<marker id="aNoTrack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1890ff"/></marker>
+<marker id="aIdRes" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#52c41a"/></marker>
+</defs>
+<rect x="5" y="5" width="345" height="370" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+<rect x="370" y="5" width="345" height="370" rx="8" fill="#1e293b" stroke="#52c41a" stroke-width="1.2"/>
+<text x="178" y="28" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="bold">AsNoTracking()</text>
+<text x="178" y="44" text-anchor="middle" fill="#94a3b8" font-size="8">En hizli - Include yoksa ideal</text>
+<text x="543" y="28" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">AsNoTrackingWithIdentityResolution()</text>
+<text x="543" y="44" text-anchor="middle" fill="#94a3b8" font-size="8">Include + tekrarli entity = bellek tasarrufu</text>
+<text x="20" y="68" fill="#64748b" font-size="8">SQL sonucu (3 satir, ayni Customer):</text>
+<rect x="20" y="75" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="28" y="87" fill="#e2e8f0" font-size="7.5">Order 1 | CustomerId=5 | Ali</text>
+<rect x="20" y="94" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="28" y="106" fill="#e2e8f0" font-size="7.5">Order 2 | CustomerId=5 | Ali</text>
+<rect x="20" y="113" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="28" y="125" fill="#e2e8f0" font-size="7.5">Order 3 | CustomerId=5 | Ali</text>
+<text x="178" y="148" text-anchor="middle" fill="#7dd3fc" font-size="9">Materialize</text>
+<text x="20" y="168" fill="#64748b" font-size="8">Bellekte 3 ayri nesne:</text>
+<rect x="20" y="176" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
+<text x="90" y="194" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer A</text>
+<text x="90" y="208" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x1A2B)</text>
+<rect x="20" y="224" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
+<text x="90" y="242" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer B</text>
+<text x="90" y="256" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x3C4D)</text>
+<rect x="20" y="272" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
+<text x="90" y="290" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer C</text>
+<text x="90" y="304" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x5E6F)</text>
+<rect x="200" y="182" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="240" y="198" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 1</text>
+<line x1="200" y1="194" x2="160" y2="194" stroke="#1890ff" stroke-width="1.2" marker-end="url(#aNoTrack)"/>
+<rect x="200" y="232" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="240" y="248" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 2</text>
+<line x1="200" y1="244" x2="160" y2="244" stroke="#1890ff" stroke-width="1.2" marker-end="url(#aNoTrack)"/>
+<rect x="200" y="280" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="240" y="296" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 3</text>
+<line x1="200" y1="292" x2="160" y2="292" stroke="#1890ff" stroke-width="1.2" marker-end="url(#aNoTrack)"/>
+<text x="178" y="340" text-anchor="middle" fill="#e2e8f0" font-size="9">obj1 == obj2  :  FALSE</text>
+<text x="178" y="358" text-anchor="middle" fill="#94a3b8" font-size="8">3 nesne x ayni veri</text>
+<text x="385" y="68" fill="#64748b" font-size="8">SQL sonucu (ayni 3 satir):</text>
+<rect x="385" y="75" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="393" y="87" fill="#e2e8f0" font-size="7.5">Order 1 | CustomerId=5 | Ali</text>
+<rect x="385" y="94" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="393" y="106" fill="#e2e8f0" font-size="7.5">Order 2 | CustomerId=5 | Ali</text>
+<rect x="385" y="113" width="310" height="16" rx="3" fill="#334155" stroke="#475569" stroke-width="0.5"/>
+<text x="393" y="125" fill="#e2e8f0" font-size="7.5">Order 3 | CustomerId=5 | Ali</text>
+<text x="543" y="148" text-anchor="middle" fill="#34d399" font-size="9">Materialize + Identity Map</text>
+<text x="385" y="168" fill="#64748b" font-size="8">Bellekte tek nesne (paylasilir):</text>
+<rect x="440" y="210" width="155" height="50" rx="6" fill="#1e293b" stroke="#52c41a" stroke-width="2"/>
+<text x="518" y="232" text-anchor="middle" fill="#34d399" font-size="9" font-weight="bold">Customer (tek!)</text>
+<text x="518" y="248" text-anchor="middle" fill="#94a3b8" font-size="8">Id=5 Ali (0x1A2B)</text>
+<rect x="630" y="190" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="670" y="206" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 1</text>
+<line x1="630" y1="204" x2="595" y2="225" stroke="#52c41a" stroke-width="1.2" marker-end="url(#aIdRes)"/>
+<rect x="630" y="222" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="670" y="238" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 2</text>
+<line x1="630" y1="234" x2="595" y2="235" stroke="#52c41a" stroke-width="1.2" marker-end="url(#aIdRes)"/>
+<rect x="630" y="254" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+<text x="670" y="270" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 3</text>
+<line x1="630" y1="266" x2="595" y2="248" stroke="#52c41a" stroke-width="1.2" marker-end="url(#aIdRes)"/>
+<rect x="400" y="285" width="280" height="40" rx="5" fill="#1e293b" stroke="#475569" stroke-dasharray="3,2"/>
+<text x="540" y="303" text-anchor="middle" fill="#34d399" font-size="8">Identity Map (sorgu suresince gecici)</text>
+<text x="540" y="317" text-anchor="middle" fill="#94a3b8" font-size="7.5">PK=5 var mi? Evet = mevcut referansi dondur</text>
+<text x="543" y="348" text-anchor="middle" fill="#e2e8f0" font-size="9">obj1 == obj2  :  TRUE</text>
+<text x="543" y="366" text-anchor="middle" fill="#94a3b8" font-size="8">1 nesne, 3 referans (bellek 1/3)</text>
+</svg>
+
+**Ne zaman hangisini kullan?**
+
+| Senaryo | Method | Neden |
+|---------|--------|-------|
+| Düz liste, Include yok | \`AsNoTracking()\` | En hızlı, identity resolution gereksiz |
+| Include var, aynı entity çok tekrar ediyor | \`AsNoTrackingWithIdentityResolution()\` | Bellek tasarrufu + tutarlı referanslar |
+| Veriyi güncelleyeceksin | Hiçbiri (normal tracking) | SaveChanges çalışsın |
+| Raporlama / dashboard | \`AsNoTrackingWithIdentityResolution()\` | Büyük veri, tekrarlı join'ler |
+
+> 💡 **Performans sıralaması (hızdan yavaşa):**
+>
+> \`AsNoTracking()\` > \`AsNoTrackingWithIdentityResolution()\` > Normal Tracking
+>
+> Fark: Identity resolution, bir Dictionary\<PK, entity\> tutar — lookup maliyeti var ama tekrarlı entity'lerde bellek kazancı çok daha büyük.
+
+\`\`\`csharp
+// 🎯 Gerçek dünya örneği: 1000 siparişi 5 müşteriye ait
+var orders = context.Orders
+    .AsNoTracking()                          // → 1000 Order + 1000 Customer nesnesi (!)
+    .Include(o => o.Customer)
+    .ToList();
+
+var orders2 = context.Orders
+    .AsNoTrackingWithIdentityResolution()    // → 1000 Order + sadece 5 Customer nesnesi ✓
+    .Include(o => o.Customer)
     .ToList();
 \`\`\`
 
@@ -3640,12 +3943,29 @@ context.ChangeTracker.Clear();  // Tüm tracked entity'leri detach eder
 
 **📌 ExecuteUpdate SQL çıktısı:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Tek SQL, entity yüklenmeden direkt güncelleme
 UPDATE [Products]
 SET [IsActive] = CAST(0 AS bit)
 WHERE [Stock] = 0;
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Tek SQL, entity yüklenmeden direkt güncelleme
+UPDATE products
+SET is_active = FALSE
+WHERE stock = 0;
+\`\`\`
+
+</details>
 
 > 💡 **Performans karşılaştırma:**
 > | Yöntem | 1000 kayıt güncelleme |
@@ -3665,7 +3985,7 @@ WHERE [Stock] = 0;
 > 💡 **Kurallar:**
 > - Read-only sorgularda **her zaman** \`AsNoTracking()\` kullan → %40-50 daha hızlı
 > - Background job / batch işlemlerde her 500-1000 kayıtta \`context.ChangeTracker.Clear()\` çağır
-> - Raporlama sorgularında \`AsNoTrackingWithIdentityResolution()\` → tracking yok ama aynı entity tekrar oluşturulmaz
+> - Raporlama sorgularında \`AsNoTrackingWithIdentityResolution()\` → tracking yok ama aynı entity **tek instance** olarak paylaşılır (bellek tasarrufu)
 > - Tek bir \`SaveChanges()\` çağrısında max **10.000** değişiklik gönder (parametre limiti!)
 >
 > ⚠️ **SQL Parametre Limiti (SaveChanges'ı etkiler):**
@@ -3949,6 +4269,9 @@ var results = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 WHERE [p].[Name] LIKE N'%phone%'
   AND [p].[Name] LIKE N'i%'
@@ -3956,6 +4279,21 @@ WHERE [p].[Name] LIKE N'%phone%'
   AND LOWER([p].[Name]) = N'iphone'
   AND LEN([p].[Name]) > 5;
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+WHERE p.name ILIKE '%phone%'
+  AND p.name LIKE 'i%'
+  AND p.name LIKE '%Pro'
+  AND LOWER(p.name) = 'iphone'
+  AND LENGTH(p.name) > 5;
+\`\`\`
+
+</details>
 
 ---
 
@@ -3969,11 +4307,27 @@ var recent = await context.Orders
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 WHERE CONVERT(date, [o].[OrderDate]) = CONVERT(date, GETDATE())
   AND DATEPART(year, [o].[OrderDate]) = 2025
   AND [o].[OrderDate] > DATEADD(day, -7, GETUTCDATE());
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+WHERE o.order_date::date = CURRENT_DATE
+  AND EXTRACT(YEAR FROM o.order_date) = 2025
+  AND o.order_date > NOW() - INTERVAL '7 days';
+\`\`\`
+
+</details>
 
 ---
 
@@ -3987,12 +4341,29 @@ var result = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 WHERE [p].[Description] IS NOT NULL
   AND [p].[DeletedAt] IS NULL;
 
 SELECT COALESCE([p].[Name], N'İsimsiz') AS [Name] FROM [Products];
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+WHERE p.description IS NOT NULL
+  AND p.deleted_at IS NULL;
+
+SELECT COALESCE(p.name, 'İsimsiz') AS name FROM products;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4007,11 +4378,27 @@ var paged = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT * FROM [Products]
 ORDER BY [Name] ASC, [Price] DESC
 OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT * FROM products
+ORDER BY name ASC, price DESC
+LIMIT 10 OFFSET 20;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4028,6 +4415,9 @@ var result = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[Name],
        CASE WHEN [p].[Stock] > 0 THEN N'Stokta' ELSE N'Tükendi' END AS [Status],
@@ -4038,6 +4428,24 @@ SELECT [p].[Name],
        END AS [PriceCategory]
 FROM [Products] AS [p];
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.name,
+       CASE WHEN p.stock > 0 THEN 'Stokta' ELSE 'Tükendi' END AS status,
+       CASE
+           WHEN p.price > 10000 THEN 'Premium'
+           WHEN p.price > 1000 THEN 'Orta'
+           ELSE 'Ekonomik'
+       END AS price_category
+FROM products AS p;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4294,6 +4702,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
 **📌 Oluşan SQL:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 CREATE TABLE [Customers] (
     [Id]              INT           IDENTITY(1,1) NOT NULL,
@@ -4312,6 +4723,32 @@ CREATE TABLE [Customers] (
     CONSTRAINT [PK_Customers] PRIMARY KEY CLUSTERED ([Id])
 );
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+CREATE TABLE customers (
+    id              INT           GENERATED BY DEFAULT AS IDENTITY,
+    full_name       VARCHAR(150)  NOT NULL,
+    email           VARCHAR(200)  NOT NULL,
+    -- shipping_address (Owned — aynı tabloda)
+    ship_street     VARCHAR(200)  NULL,
+    ship_city       VARCHAR(100)  NULL,
+    ship_postal_code VARCHAR(10)  NULL,
+    ship_country    VARCHAR(50)   NULL,
+    -- billing_address (Owned — aynı tabloda)
+    bill_street     VARCHAR(200)  NULL,
+    bill_city       VARCHAR(100)  NULL,
+    bill_postal_code VARCHAR(10)  NULL,
+    bill_country    VARCHAR(50)   NULL,
+    CONSTRAINT pk_customers PRIMARY KEY (id)
+);
+\`\`\`
+
+</details>
 
 **📌 Örnek veri:**
 
@@ -4401,6 +4838,9 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
 **📌 Oluşan SQL:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 CREATE TABLE [Orders] (
     [Id]        INT          IDENTITY(1,1) NOT NULL,
@@ -4418,6 +4858,31 @@ CREATE TABLE [OrderLineItems] (
     CONSTRAINT [FK_OrderLineItems_Orders] FOREIGN KEY ([OrderId]) REFERENCES [Orders]([Id]) ON DELETE CASCADE
 );
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+CREATE TABLE orders (
+    id        INT          GENERATED BY DEFAULT AS IDENTITY,
+    reference TEXT         NULL,
+    CONSTRAINT pk_orders PRIMARY KEY (id)
+);
+
+CREATE TABLE order_line_items (
+    id           INT           GENERATED BY DEFAULT AS IDENTITY,
+    order_id     INT           NOT NULL,
+    product_name VARCHAR(200)  NOT NULL,
+    quantity     INT           NOT NULL,
+    unit_price   NUMERIC(18,2) NOT NULL,
+    CONSTRAINT pk_order_line_items PRIMARY KEY (id),
+    CONSTRAINT fk_order_line_items_orders FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+\`\`\`
+
+</details>
 
 **📌 Örnek veri:**
 
@@ -4524,6 +4989,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
 **📌 Oluşan SQL:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 CREATE TABLE [Products] (
     [Id]             INT           IDENTITY(1,1) NOT NULL,
@@ -4535,6 +5003,25 @@ CREATE TABLE [Products] (
     CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED ([Id])
 );
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+CREATE TABLE products (
+    id             INT           GENERATED BY DEFAULT AS IDENTITY,
+    name           VARCHAR(200)  NOT NULL,
+    price_amount   NUMERIC(18,2) NOT NULL,
+    price_currency VARCHAR(3)    NOT NULL,
+    cost_amount    NUMERIC(18,2) NOT NULL,
+    cost_currency  VARCHAR(3)    NOT NULL,
+    CONSTRAINT pk_products PRIMARY KEY (id)
+);
+\`\`\`
+
+</details>
 
 **📌 Örnek veri:**
 
@@ -5627,11 +6114,28 @@ var todayAdded = await context.Products
 
 **📌 Oluşan SQL:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT TOP(10) [p].[Id], [p].[Name], [p].[Price]
 FROM [Products] AS [p]
 ORDER BY [p].[CreatedAt] DESC;
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.id, p.name, p.price
+FROM products AS p
+ORDER BY p.created_at DESC
+LIMIT 10;
+\`\`\`
+
+</details>
 
 ### Shadow Property'ye Index Ekleme
 
@@ -5674,6 +6178,9 @@ var allProducts = context.Products.IgnoreQueryFilters().ToList();
 context.Products.Where(p => p.Price > 100).ToList();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF'in ürettiği SQL (filtre otomatik eklenir):
 SELECT [p].[Id], [p].[Name], [p].[Price]
@@ -5681,6 +6188,21 @@ FROM [Products] AS [p]
 WHERE [p].[Price] > 100.0 
   AND [p].[IsDeleted] = CAST(0 AS bit);    -- ← Otomatik eklendi!
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF'in ürettiği SQL (filtre otomatik eklenir):
+SELECT p.id, p.name, p.price
+FROM products AS p
+WHERE p.price > 100.0 
+  AND p.is_deleted = FALSE;                -- ← Otomatik eklendi!
+\`\`\`
+
+</details>
 
 \`\`\`csharp
 // Filtreyi devre dışı bırak (admin paneli, raporlama vb.)
@@ -6774,6 +7296,9 @@ public async Task<List<Product>> GetProductsAfterAsync(
 
 ### SQL Çıktısı (Keyset)
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- lastId = 5000 sonrasını getir
 SELECT TOP(20) [p].[Id], [p].[Name], [p].[Price]
@@ -6781,6 +7306,22 @@ FROM [Products] AS [p]
 WHERE [p].[IsActive] = 1 AND [p].[Id] > 5000
 ORDER BY [p].[Id];
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- lastId = 5000 sonrasını getir
+SELECT p.id, p.name, p.price
+FROM products AS p
+WHERE p.is_active = TRUE AND p.id > 5000
+ORDER BY p.id
+LIMIT 20;
+\`\`\`
+
+</details>
 
 ### Karşılaştırma
 
@@ -7101,6 +7642,9 @@ await context.Products
         .SetProperty(p => p.UpdatedAt, DateTime.UtcNow));
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- ExecuteUpdate: tek SQL, Change Tracker bypass
 UPDATE [Products]
@@ -7116,6 +7660,29 @@ UPDATE [Products]
 SET [Price] = [Price] * 1.10, [UpdatedAt] = '2025-03-15T14:30:00Z'
 WHERE [Price] < 100.0;
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- ExecuteUpdate: tek SQL, Change Tracker bypass
+UPDATE products
+SET is_active = TRUE, updated_at = '2025-03-15T14:30:00Z'
+WHERE category_id = 5 AND is_active = FALSE;
+
+-- ExecuteDelete
+DELETE FROM products
+WHERE is_deleted = TRUE AND deleted_at < '2024-03-15T14:30:00Z';
+
+-- %10 zam
+UPDATE products
+SET price = price * 1.10, updated_at = '2025-03-15T14:30:00Z'
+WHERE price < 100.0;
+\`\`\`
+
+</details>
 
 ---
 
@@ -7644,6 +8211,9 @@ SQL Server 2025 + EF Core 10 ile artık \`NVARCHAR(MAX)\` yerine **native \`json
 builder.Property(o => o.ShippingAddress).HasColumnType("nvarchar(max)");
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF Core 10 ile oluşan tablo (SQL Server 2025):
 CREATE TABLE [Orders] (
@@ -7659,6 +8229,28 @@ FROM [Orders] AS [o]
 WHERE JSON_VALUE([o].[ShippingAddress], '$.City' RETURNING nvarchar(max)) = N'İstanbul';
 \`\`\`
 
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- PostgreSQL zaten native JSONB destekler (SQL Server 2025'ten önce):
+CREATE TABLE orders (
+    id               INT  GENERATED BY DEFAULT AS IDENTITY,
+    shipping_address JSONB NOT NULL,   -- Binary JSON (index destekli)
+    tags             JSONB NOT NULL,
+    CONSTRAINT pk_orders PRIMARY KEY (id)
+);
+
+-- JSONB operatörü ile sorgulama:
+SELECT o.id, o.shipping_address
+FROM orders AS o
+WHERE o.shipping_address->>'City' = 'İstanbul';
+\`\`\`
+
+</details>
+
 ---
 
 ### 🆕 EF Core 10: ExecuteUpdate ile JSON Property Güncelleme
@@ -7673,6 +8265,9 @@ await context.Blogs.ExecuteUpdateAsync(s =>
     s.SetProperty(b => b.Details.Views, b => b.Details.Views + 1));
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- SQL Server 2025 (native json tipi ile):
 UPDATE [b]
@@ -7684,6 +8279,20 @@ UPDATE [b]
 SET [Details] = JSON_MODIFY([b].[Details], '$.Views', JSON_VALUE([b].[Details], '$.Views') + 1)
 FROM [Blogs] AS [b];
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- PostgreSQL: jsonb_set ile partial update
+UPDATE blogs
+SET details = jsonb_set(details, '{Views}', ((details->>'Views')::int + 1)::text::jsonb)
+;
+\`\`\`
+
+</details>
 
 > 💡 **Önemli:** JSON ExecuteUpdate sadece **Complex Type** mapping ile çalışır. \`OwnsOne/OwnsMany\` ile map edilmiş JSON'larda desteklenmez — EF Core 10'da Complex Type'a geçiş önerilir.
 
@@ -9617,6 +10226,9 @@ var similar = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Üretilen SQL (SQL Server 2025):
 SELECT TOP(5) [p].[Id], [p].[Name], [p].[Embedding]
@@ -9624,8 +10236,27 @@ FROM [Products] AS [p]
 ORDER BY VECTOR_DISTANCE('cosine', [p].[Embedding], @queryVector);
 \`\`\`
 
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Üretilen SQL (pgvector extension gerekli):
+SELECT p.id, p.name, p.embedding
+FROM products AS p
+ORDER BY p.embedding <=> @queryVector   -- cosine distance operatörü
+LIMIT 5;
+
+-- pgvector kurulumu:
+-- CREATE EXTENSION vector;
+-- CREATE INDEX ON products USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+\`\`\`
+
+</details>
+
 > 💡 **Kullanım alanları:** RAG (Retrieval-Augmented Generation), ürün önerisi, benzer doküman bulma, semantic search.  
-> **Gereksinimler:** SQL Server 2025 veya Azure SQL Database + \`Microsoft.Data.SqlClient\` 6.0+
+> **Gereksinimler:** SQL Server 2025 veya Azure SQL Database + \`Microsoft.Data.SqlClient\` 6.0+ | PostgreSQL: \`pgvector\` extension
 
 ---
 
@@ -11173,6 +11804,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
 **📌 Oluşan tam SQL:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 CREATE TABLE [catalog].[Products] (
     [Id]            INT            IDENTITY(1,1) NOT NULL,
@@ -11203,6 +11837,44 @@ CREATE NONCLUSTERED INDEX [IX_Products_Category_Active]
 CREATE NONCLUSTERED INDEX [IX_Products_CategoryId] 
     ON [catalog].[Products] ([CategoryId]);
 \`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+CREATE TABLE catalog.products (
+    id             INT            GENERATED BY DEFAULT AS IDENTITY,
+    product_name   VARCHAR(200)   NOT NULL,
+    price          NUMERIC(18,2)  NOT NULL,
+    sku            VARCHAR(450)   NOT NULL,
+    category_id    INT            NOT NULL,
+    is_active      BOOLEAN        NOT NULL,
+    is_deleted     BOOLEAN        NOT NULL,
+    created_at     TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    xmin           xid            NOT NULL,   -- PostgreSQL concurrency token
+    dim_width      DOUBLE PRECISION NULL,
+    dim_height     DOUBLE PRECISION NULL,
+    dim_depth      DOUBLE PRECISION NULL,
+    tags           JSONB          NULL,
+    
+    CONSTRAINT pk_products PRIMARY KEY (id),
+    CONSTRAINT fk_products_categories_category_id 
+        FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON DELETE NO ACTION
+);
+
+CREATE UNIQUE INDEX ux_products_sku 
+    ON catalog.products (sku);
+
+CREATE INDEX ix_products_category_active 
+    ON catalog.products (category_id, is_active);
+
+CREATE INDEX ix_products_category_id 
+    ON catalog.products (category_id);
+\`\`\`
+
+</details>
 
 ---
 
@@ -11462,7 +12134,7 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
         const introItems = groups.other.filter(item => item.text.includes('Giriş'));
         const trailingOther = groups.other.filter(item => !item.text.includes('Giriş'));
         introItems.forEach(item => {
-            html += `<a href="#${item.id}" onclick="closeSidebarMobile()" style="padding-left:1rem;font-weight:600">${item.text}</a>`;
+            html += `<a href="#${item.id}" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;" style="padding-left:1rem;font-weight:600">${item.text}</a>`;
         });
         levels.forEach(level => {
             const items = groups[level.key];
@@ -11476,11 +12148,11 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
             html += `</div>`;
             html += `<div class="toc-group-items">`;
             items.forEach(item => {
-                html += `<a href="#${item.id}" onclick="closeSidebarMobile()">${item.text}</a>`;
+                html += `<a href="#${item.id}" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;">${item.text}</a>`;
                 if (item.subItems && item.subItems.length > 0) {
                     html += `<div class="toc-sub-container">`;
                     item.subItems.forEach(sub => {
-                        html += `<a href="#${sub.id}" class="toc-sub-item" onclick="closeSidebarMobile()">${sub.text}</a>`;
+                        html += `<a href="#${sub.id}" class="toc-sub-item" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;">${sub.text}</a>`;
                     });
                     html += `</div>`;
                 }
@@ -11490,11 +12162,11 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
         // Other (ungrouped, excluding intro items already rendered)
         if (trailingOther.length > 0) {
             trailingOther.forEach(item => {
-                html += `<a href="#${item.id}" onclick="closeSidebarMobile()" style="padding-left:1rem">${item.text}</a>`;
+                html += `<a href="#${item.id}" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;" style="padding-left:1rem">${item.text}</a>`;
                 if (item.subItems && item.subItems.length > 0) {
                     html += `<div class="toc-sub-container">`;
                     item.subItems.forEach(sub => {
-                        html += `<a href="#${sub.id}" class="toc-sub-item" onclick="closeSidebarMobile()">${sub.text}</a>`;
+                        html += `<a href="#${sub.id}" class="toc-sub-item" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;">${sub.text}</a>`;
                     });
                     html += `</div>`;
                 }
@@ -11776,7 +12448,7 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
             } else {
                 panel.innerHTML = `<div class="search-info">${results.length} sonuç</div>` +
                     results.slice(0, 15).map(r => 
-                        `<a href="#${r.id}" class="search-result-item" onclick="closeSidebarMobile()">
+                        `<a href="#${r.id}" class="search-result-item" onclick="navigateToId(this.getAttribute('href').slice(1)); return false;">
                             <span class="result-section">${r.title}</span>
                             ${r.snippet ? `<span class="result-snippet">${r.snippet}</span>` : ''}
                         </a>`
@@ -11884,6 +12556,53 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
         mutObs.observe(tocContainer, { subtree: true, attributes: true, attributeFilter: ['class'] });
     }
 
+    // --- Navigation Fix: expand lazy placeholders when navigating ---
+    function expandAllLazy() {
+        document.querySelectorAll('.section-lazy-placeholder').forEach(placeholder => {
+            if (placeholder._fragment && placeholder.dataset.loaded === 'false') {
+                placeholder.dataset.loaded = 'true';
+                placeholder.parentNode.insertBefore(placeholder._fragment, placeholder);
+                placeholder.remove();
+            }
+        });
+    }
+
+    function navigateToId(id) {
+        closeSidebarMobile();
+        let target = document.getElementById(id);
+        if (!target) {
+            // Target is inside a lazy placeholder - expand all and retry
+            expandAllLazy();
+            target = document.getElementById(id);
+        }
+        if (target) {
+            history.pushState(null, '', '#' + id);
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Re-apply syntax highlighting to newly expanded content
+            document.querySelectorAll('pre code:not(.hljs)').forEach(el => hljs.highlightElement(el));
+        }
+    }
+
+    function handleInitialHash() {
+        const hash = location.hash.slice(1);
+        if (hash) {
+            let target = document.getElementById(hash);
+            if (!target) {
+                expandAllLazy();
+                target = document.getElementById(hash);
+            }
+            if (target) {
+                setTimeout(() => target.scrollIntoView({ block: 'start' }), 50);
+                document.querySelectorAll('pre code:not(.hljs)').forEach(el => hljs.highlightElement(el));
+            }
+        }
+    }
+
+    window.addEventListener('hashchange', () => {
+        const hash = location.hash.slice(1);
+        if (hash) navigateToId(hash);
+    });
+
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
         renderContent();
@@ -11891,6 +12610,7 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
             lazyRenderSections();
             buildSearchIndex();
             enhanceActiveTocScroll();
+            handleInitialHash();
         }, 100);
     });
     </script>
