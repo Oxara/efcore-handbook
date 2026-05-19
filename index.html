@@ -53,18 +53,72 @@
         }
         .layout {
             display: flex;
-            min-height: 100vh;
+            min-height: calc(100vh - var(--header-height));
+            margin-top: var(--header-height);
+        }
+        /* Top Header */
+        :root { --header-height: 52px; }
+        .top-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--header-height);
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.25rem;
+            gap: 1rem;
+            z-index: 200;
+        }
+        .top-header .home-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.3rem;
+            border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
+            line-height: 1;
+        }
+        .top-header .home-btn:hover {
+            color: var(--accent);
+            background: var(--accent-subtle);
+        }
+        .top-header .header-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .top-header .header-brand h1 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.2;
+        }
+        .top-header .header-brand span {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .top-header .header-spacer { flex: 1; }
+        .top-header .global-switch {
+            margin: 0;
+        }
+        .top-header .search-box {
+            margin: 0;
+            width: 380px;
         }
         /* Sidebar */
         .sidebar {
             position: fixed;
-            left: 0; top: 0;
+            left: 0; top: var(--header-height);
             width: 300px;
-            height: 100vh;
+            height: calc(100vh - var(--header-height));
             overflow-y: auto;
             background: var(--bg-elevated);
             border-right: 1px solid var(--border);
-            padding: 1.5rem 0 2rem;
+            padding: 0.75rem 0 2rem;
             z-index: 100;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -85,16 +139,7 @@
             opacity: 0.5;
         }
         .sidebar-brand {
-            padding: 0 1.25rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1rem;
-        }
-        .sidebar-brand h1 {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.01em;
-            margin: 0;
+            display: none;
         }
         .sidebar-brand span {
             font-size: 0.72rem;
@@ -767,6 +812,11 @@
         .search-result-item mark { background: rgba(251, 191, 36, 0.3); color: inherit; border-radius: 2px; padding: 0 1px; }
         .search-info { font-size: 0.68rem; color: var(--text-muted); padding: 0.3rem 0.6rem; }
 
+        /* SVG diagram boyutları */
+        svg[viewBox] {
+            max-width: min(75%, 750px) !important;
+        }
+
         /* Print CSS */
         @media print {
             body { background: #fff !important; color: #000 !important; font-size: 10pt; }
@@ -805,21 +855,27 @@
     <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})" aria-label="Başa dön">↑</button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Tema değiştir">🌙</button>
 
+    <header class="top-header">
+        <button class="home-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});navigateToId('section-0');" title="Başa dön" aria-label="Başa dön">⌂</button>
+        <div class="header-brand">
+            <h1>EF Core El Kitabı</h1>
+            <span>Geliştirici Referansı &mdash; v8 / v9 / v10</span>
+        </div>
+        <div class="header-spacer"></div>
+        <div class="search-box" role="search">
+            <input type="text" id="tocSearch" placeholder="İçerik ara... (başlık + metin)" oninput="handleSearch(this.value)" aria-label="İçerik ara">
+            <span class="search-kbd-hint">/</span>
+        </div>
+        <div class="header-spacer"></div>
+        <div class="global-switch" role="group" aria-label="Veritabanı seçimi">
+            <button id="globalSql" class="active-sql" onclick="switchAll('sqlserver')" aria-pressed="true">SQL Server</button>
+            <button id="globalPg" onclick="switchAll('postgresql')" aria-pressed="false">PostgreSQL</button>
+        </div>
+    </header>
+
     <div class="layout">
         <nav class="sidebar" id="sidebar" aria-label="İçindekiler">
             <div class="sidebar-resize-handle" id="sidebarResizeHandle"></div>
-            <div class="sidebar-brand">
-                <h1>EF Core El Kitabı</h1>
-                <span>Geliştirici Referansı &mdash; v8 / v9 / v10</span>
-            </div>
-            <div class="global-switch" role="group" aria-label="Veritabanı seçimi">
-                <button id="globalSql" class="active-sql" onclick="switchAll('sqlserver')" aria-pressed="true">SQL Server</button>
-                <button id="globalPg" onclick="switchAll('postgresql')" aria-pressed="false">PostgreSQL</button>
-            </div>
-            <div class="search-box" role="search">
-                <input type="text" id="tocSearch" placeholder="İçerik ara... (başlık + metin)" oninput="handleSearch(this.value)" aria-label="İçerik ara">
-                <span class="search-kbd-hint">/</span>
-            </div>
             <div class="search-results-panel" id="searchResults" role="listbox" aria-label="Arama sonuçları"></div>
             <div id="tocLinks" role="navigation" aria-label="Bölüm listesi"></div>
         </nav>
@@ -2411,12 +2467,52 @@ CREATE TABLE student_courses (
 > - \`Restrict\` → Kategori silinemesin eğer altında ürün varsa
 > - \`SetNull\` → Yazar silinince kitaptaki AuthorId NULL olsun
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+> 💡 **SQL Server'da FK davranışları:**
+> - FK constraint syntax: \`REFERENCES\`, \`ON DELETE CASCADE\` — EF Fluent API aynı
+> - SQL Server'da \`ON DELETE RESTRICT\` ile \`NO ACTION\` pratikte **aynı** davranır (her ikisi de anında kontrol eder)
+> - **Deferrable FK desteklenmez** — circular insert senaryolarında sıra önemlidir
+
+\`\`\`sql
+-- SQL Server: FK her zaman anında kontrol eder (deferred yok)
+-- Circular insert yapılamaz, sıralama zorunludur:
+INSERT INTO Orders (Id) VALUES (1);                          -- Önce parent
+INSERT INTO OrderItems (Id, OrderId) VALUES (10, 1);         -- Sonra child
+
+-- FK violation örneği:
+INSERT INTO OrderItems (Id, OrderId) VALUES (20, 999);       -- ❌ FK hata (Order 999 yok)
+\`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
 > 🐘 **PostgreSQL İlişki Farkları:**
 > - FK constraint syntax aynıdır (\`REFERENCES\`, \`ON DELETE CASCADE\`) — EF Fluent API fark etmez
 > - PostgreSQL'de \`ON DELETE RESTRICT\` vs \`NO ACTION\` farkı var:
 >   - \`RESTRICT\` → kontrol **anında** yapılır (deferred olamaz)
 >   - \`NO ACTION\` → transaction sonunda kontrol edilir (deferrable)
-> - Deferrable FK (transaction sonunda kontrol) — circular reference'lar için kritik:
+> - **Deferrable FK** → constraint kontrolünü transaction sonuna erteleyebilme özelliği
+
+> 📖 **Deferrable FK Nedir?**
+> Normal FK constraint, INSERT/UPDATE anında **hemen** kontrol edilir. Deferrable FK ise kontrolü transaction'ın **COMMIT** anına erteler.
+>
+> **Ne işe yarar?**
+> - **Circular reference** senaryolarında: A tablosu B'ye, B tablosu A'ya referans veriyorsa → hangi kaydı önce eklersin? Normal FK'da imkansız!
+> - **Bulk data loading:** Binlerce ilişkili kaydı sıra dert etmeden tek transaction'da ekle, COMMIT'te hepsi kontrol edilsin
+> - **Data migration:** Eski sistemden veri taşırken FK sırasını düşünmene gerek kalmaz
+>
+> **Modları:**
+> | Mod | Açıklama |
+> |-----|----------|
+> | \`NOT DEFERRABLE\` | Varsayılan — her satır anında kontrol edilir |
+> | \`DEFERRABLE INITIALLY IMMEDIATE\` | Varsayılan olarak anında, ama \`SET CONSTRAINTS ... DEFERRED\` ile ertelenebilir |
+> | \`DEFERRABLE INITIALLY DEFERRED\` | Varsayılan olarak transaction COMMIT'te kontrol eder |
+>
+> ⚠️ **Dezavantaj:** Hata geç fark edilir — COMMIT anında FK violation alırsın, hangi INSERT'in soruna yol açtığını bulmak zorlaşır.
 
 \`\`\`sql
 -- PostgreSQL: Deferrable FK (SQL Server'da yok!)
@@ -2431,6 +2527,12 @@ BEGIN;
     INSERT INTO orders (id, first_item_id) VALUES (1, 10);  -- first_item_id henüz yok
     INSERT INTO order_items (id, order_id) VALUES (10, 1);   -- şimdi var
 COMMIT;  -- Her iki FK burada kontrol edilir → ✅
+
+-- Geçici olarak deferrable yapma (INITIALLY IMMEDIATE olanlar için):
+BEGIN;
+    SET CONSTRAINTS fk_order DEFERRED;   -- Bu transaction için ertele
+    -- ... sırasız INSERT'ler ...
+COMMIT;  -- Burada kontrol edilir
 \`\`\`
 
 \`\`\`csharp
@@ -2449,6 +2551,8 @@ migrationBuilder.Sql(@"
 
 > 💡 **snake_case convention kullanıyorsan:** FK constraint isimleri de snake_case olur:
 > \`fk_order_items_orders_order_id\` (SQL Server: \`FK_OrderItems_Orders_OrderId\`)
+
+</details>
 
 ---
 
@@ -3004,6 +3108,7 @@ INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id];
 
 \`\`\`sql
 -- 1️⃣ Include(p => p.Category) — tekil referans, her satır = 1 ürün
+-- ⚡ ORDER BY yok: Category reference navigation (1:1 eşleşme, gruplama gereksiz)
 SELECT p.id, p.name, p.price, p.category_id,
        c.id, c.name
 FROM products AS p
@@ -3041,6 +3146,7 @@ ORDER BY [c].[Id], [p].[Id];
 
 \`\`\`sql
 -- 2️⃣ Include + ThenInclude (iki seviye JOIN)
+-- ⚡ ORDER BY'ı EF Core otomatik ekler (entity materialization için gerekli)
 SELECT c.id, c.name,
        p.id, p.name, p.category_id,
        t.id, t.name, t.product_id
@@ -3263,24 +3369,34 @@ WHERE c.id = @categoryId;
 > // Toplam: 1 + N sorgu (100 ürün = 101 sorgu!)
 > \`\`\`
 >
-> \`\`\`sql
-> -- Döngüdeki her iterasyon için ayrı sorgu (SQL Server):
-> SELECT * FROM Products;                                    -- 1. sorgu
-> SELECT * FROM Categories WHERE Id = 1;                    -- 2. sorgu
-> SELECT * FROM Categories WHERE Id = 2;                    -- 3. sorgu
-> SELECT * FROM Categories WHERE Id = 1;                    -- 4. (aynı bile olsa!)
-> -- ... 100 ürün = 101 sorgu!
-> \`\`\`
-> \`\`\`sql
-> -- Döngüdeki her iterasyon için ayrı sorgu (PostgreSQL):
-> SELECT * FROM products;                                    -- 1. sorgu
-> SELECT * FROM categories WHERE id = 1;                    -- 2. sorgu
-> SELECT * FROM categories WHERE id = 2;                    -- 3. sorgu
-> SELECT * FROM categories WHERE id = 1;                    -- 4. (aynı bile olsa!)
-> -- ... 100 ürün = 101 sorgu!
-> \`\`\`
->
 > **Çözüm:** \`Include()\` kullan veya projection (Select) yap.
+
+<details open>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`sql
+-- Döngüdeki her iterasyon için ayrı sorgu:
+SELECT * FROM Products;                                    -- 1. sorgu
+SELECT * FROM Categories WHERE Id = 1;                    -- 2. sorgu
+SELECT * FROM Categories WHERE Id = 2;                    -- 3. sorgu
+SELECT * FROM Categories WHERE Id = 1;                    -- 4. (aynı bile olsa!)
+-- ... 100 ürün = 101 sorgu!
+\`\`\`
+
+</details>
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Döngüdeki her iterasyon için ayrı sorgu:
+SELECT * FROM products;                                    -- 1. sorgu
+SELECT * FROM categories WHERE id = 1;                    -- 2. sorgu
+SELECT * FROM categories WHERE id = 2;                    -- 3. sorgu
+SELECT * FROM categories WHERE id = 1;                    -- 4. (aynı bile olsa!)
+-- ... 100 ürün = 101 sorgu!
+\`\`\`
+
+</details>
 
 ---
 
@@ -4019,6 +4135,9 @@ var cheapest = await context.Products.MinAsync(p => p.Price);
 var mostExpensive = await context.Products.MaxAsync(p => p.Price);
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT COUNT(*) FROM [Products] WHERE [IsActive] = 1;
 SELECT SUM([Stock]) FROM [Products];
@@ -4026,6 +4145,21 @@ SELECT AVG([Price]) FROM [Products];
 SELECT MIN([Price]) FROM [Products];
 SELECT MAX([Price]) FROM [Products];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT COUNT(*) FROM products WHERE is_active = TRUE;
+SELECT SUM(stock) FROM products;
+SELECT AVG(price) FROM products;
+SELECT MIN(price) FROM products;
+SELECT MAX(price) FROM products;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4045,6 +4179,9 @@ var stats = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[CategoryId],
        COUNT(*) AS [ProductCount],
@@ -4053,6 +4190,22 @@ SELECT [p].[CategoryId],
 FROM [Products] AS [p]
 GROUP BY [p].[CategoryId];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.category_id,
+       COUNT(*) AS product_count,
+       AVG(p.price) AS avg_price,
+       MAX(p.price) AS max_price
+FROM products AS p
+GROUP BY p.category_id;
+\`\`\`
+
+</details>
 
 \`\`\`csharp
 // GroupBy + Having (filtrelenmiş grup)
@@ -4063,12 +4216,29 @@ var popularCategories = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[CategoryId] AS [Key], COUNT(*) AS [Count]
 FROM [Products] AS [p]
 GROUP BY [p].[CategoryId]
 HAVING COUNT(*) > 5;
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.category_id AS key, COUNT(*) AS count
+FROM products AS p
+GROUP BY p.category_id
+HAVING COUNT(*) > 5;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4088,11 +4258,27 @@ var result = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[Name] AS [ProductName], [c].[Name] AS [CategoryName]
 FROM [Products] AS [p]
 INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.name AS product_name, c.name AS category_name
+FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id;
+\`\`\`
+
+</details>
 
 \`\`\`csharp
 // Left Join — DefaultIfEmpty pattern
@@ -4111,12 +4297,29 @@ var result = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[Name] AS [Product],
        COALESCE([r].[Comment], N'Yorum yok') AS [Review]
 FROM [Products] AS [p]
 LEFT JOIN [Reviews] AS [r] ON [p].[Id] = [r].[ProductId];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.name AS product,
+       COALESCE(r.comment, 'Yorum yok') AS review
+FROM products AS p
+LEFT JOIN reviews AS r ON p.id = r.product_id;
+\`\`\`
+
+</details>
 
 > 💡 **Navigation property varsa Join yazma!** EF Core \`Include\` veya \`Select(p => p.Category.Name)\` ile otomatik JOIN üretir. Manuel \`Join()\` sadece navigation olmayan senaryolar için.
 
@@ -4153,6 +4356,9 @@ var result2 = await context.OrderItems
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- LeftJoin çıktısı:
 SELECT [s].[FirstName], [s].[LastName],
@@ -4165,6 +4371,26 @@ SELECT [p].[Name], CASE WHEN [o].[Id] IS NOT NULL THEN 1 ELSE 0 END AS [Sold]
 FROM [OrderItems] AS [o]
 RIGHT JOIN [Products] AS [p] ON [o].[ProductId] = [p].[Id];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- LeftJoin çıktısı:
+SELECT s.first_name, s.last_name,
+       COALESCE(d.name, '[Atanmamış]') AS department
+FROM students AS s
+LEFT JOIN departments AS d ON s.department_id = d.id;
+
+-- RightJoin çıktısı:
+SELECT p.name, CASE WHEN o.id IS NOT NULL THEN TRUE ELSE FALSE END AS sold
+FROM order_items AS o
+RIGHT JOIN products AS p ON o.product_id = p.id;
+\`\`\`
+
+</details>
 
 > 💡 **EF Core 9 ve öncesi** → \`GroupJoin + SelectMany + DefaultIfEmpty\` (yukarıdaki karmaşık pattern).  
 > **EF Core 10+** → \`LeftJoin()\` / \`RightJoin()\` tek satır. C# query syntax (\`from...select\`) henüz desteklemiyor.
@@ -4187,6 +4413,9 @@ var filtered = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Any
 SELECT CASE WHEN EXISTS (
@@ -4200,6 +4429,27 @@ SELECT CASE WHEN NOT EXISTS (
 SELECT * FROM [Products]
 WHERE [CategoryId] IN (1, 3, 5);
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Any
+SELECT EXISTS (
+    SELECT 1 FROM products WHERE price > 100000);
+
+-- All
+SELECT NOT EXISTS (
+    SELECT 1 FROM products WHERE is_active = FALSE);
+
+-- Contains → IN (veya = ANY)
+SELECT * FROM products
+WHERE category_id = ANY(ARRAY[1, 3, 5]);
+\`\`\`
+
+</details>
 
 > 🆕 **EF Core 10 — Parameterized Collection iyileştirmesi:**
 > \`\`\`csharp
@@ -4241,6 +4491,9 @@ var onlyInProducts = await context.Products.Select(p => p.Name)
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT DISTINCT [c].[City] FROM [Customers] AS [c];
 
@@ -4254,6 +4507,27 @@ SELECT [p].[Name] FROM [Products] AS [p]
 EXCEPT
 SELECT [a].[Name] FROM [ArchivedProducts] AS [a];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT DISTINCT c.city FROM customers AS c;
+
+-- Union
+SELECT p.name FROM products AS p
+UNION
+SELECT c.name FROM categories AS c;
+
+-- Except
+SELECT p.name FROM products AS p
+EXCEPT
+SELECT a.name FROM archived_products AS a;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4506,6 +4780,9 @@ var dtos = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- ❌ Kötü yaklaşım: her şeyi çeker
 SELECT [p].*, [c].* FROM [Products] AS [p]
@@ -4516,6 +4793,24 @@ SELECT [p].[Id], [p].[Name], [c].[Name] AS [CategoryName]
 FROM [Products] AS [p]
 INNER JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- ❌ Kötü yaklaşım: her şeyi çeker
+SELECT p.*, c.* FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id;
+
+-- ✅ İyi yaklaşım: sadece 3 sütun
+SELECT p.id, p.name, c.name AS category_name
+FROM products AS p
+INNER JOIN categories AS c ON p.category_id = c.id;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4539,6 +4834,9 @@ var orders = await context.Orders
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [o].[Id] AS [OrderId],
        [c].[Name] AS [CustomerName],
@@ -4556,6 +4854,31 @@ LEFT JOIN (
 ) AS [li1] ON [li1].[OrderId] = [o].[Id]
 ORDER BY [o].[Id];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT o.id AS order_id,
+       c.name AS customer_name,
+       (SELECT SUM(li.quantity * li.unit_price) FROM order_line_items AS li
+        WHERE li.order_id = o.id) AS total_amount,
+       (SELECT COUNT(*) FROM order_line_items AS li0
+        WHERE li0.order_id = o.id) AS item_count,
+       li1.product_name, li1.quantity, li1.quantity * li1.unit_price AS line_total
+FROM orders AS o
+INNER JOIN customers AS c ON o.customer_id = c.id
+LEFT JOIN (
+    SELECT li.order_id, p.name AS product_name, li.quantity, li.unit_price
+    FROM order_line_items AS li
+    INNER JOIN products AS p ON li.product_id = p.id
+) AS li1 ON li1.order_id = o.id
+ORDER BY o.id;
+\`\`\`
+
+</details>
 
 ---
 
@@ -4579,11 +4902,27 @@ var dtos = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [p].[Name], COALESCE([c].[Name], N'Kategorisiz') AS [CategoryName]
 FROM [Products] AS [p]
 LEFT JOIN [Categories] AS [c] ON [p].[CategoryId] = [c].[Id];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.name, COALESCE(c.name, 'Kategorisiz') AS category_name
+FROM products AS p
+LEFT JOIN categories AS c ON p.category_id = c.id;
+\`\`\`
+
+</details>
 
 ---
 
@@ -5047,6 +5386,9 @@ var pahalılar = context.Products
     .ToList();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF'in ürettiği SQL:
 SELECT [p].[Id], [p].[Name], [p].[Price_Amount], [p].[Price_Currency], 
@@ -5054,6 +5396,21 @@ SELECT [p].[Id], [p].[Name], [p].[Price_Amount], [p].[Price_Currency],
 FROM [Products] AS [p]
 WHERE [p].[Price_Amount] > 10000.0 AND [p].[Price_Currency] = N'TRY';
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF'in ürettiği SQL:
+SELECT p.id, p.name, p.price_amount, p.price_currency, 
+       p.cost_amount, p.cost_currency
+FROM products AS p
+WHERE p.price_amount > 10000.0 AND p.price_currency = 'TRY';
+\`\`\`
+
+</details>
 
 ---
 
@@ -5249,6 +5606,9 @@ var tumOdemeler = context.Payments.ToList();
 var kartlar = context.Payments.OfType<CreditCardPayment>().ToList();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- OfType<CreditCardPayment>() → SQL:
 SELECT [p].[Id], [p].[Amount], [p].[PaidAt], [p].[OrderId],
@@ -5256,6 +5616,21 @@ SELECT [p].[Id], [p].[Amount], [p].[PaidAt], [p].[OrderId],
 FROM [Payments] AS [p]
 WHERE [p].[PaymentType] = N'credit_card';
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- OfType<CreditCardPayment>() → SQL:
+SELECT p.id, p.amount, p.paid_at, p.order_id,
+       p.last4_digits, p.card_holder
+FROM payments AS p
+WHERE p.payment_type = 'credit_card';
+\`\`\`
+
+</details>
 
 ---
 
@@ -6209,12 +6584,29 @@ WHERE p.price > 100.0
 context.Products.IgnoreQueryFilters().Where(p => p.Price > 100).ToList();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Filtresiz:
 SELECT [p].[Id], [p].[Name], [p].[Price]
 FROM [Products] AS [p]
 WHERE [p].[Price] > 100.0;                 -- Filtre YOK
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Filtresiz:
+SELECT p.id, p.name, p.price
+FROM products AS p
+WHERE p.price > 100.0;                     -- Filtre YOK
+\`\`\`
+
+</details>
 
 **📌 Örnek veri — Products (IsDeleted ile):**
 
@@ -6259,6 +6651,9 @@ var everything = await context.Products
     .ToListAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- IgnoreQueryFilters(["SoftDelete"]) ile:
 SELECT * FROM [Products] WHERE [TenantId] = @tenantId;  -- IsDeleted filtresi YOK
@@ -6266,6 +6661,21 @@ SELECT * FROM [Products] WHERE [TenantId] = @tenantId;  -- IsDeleted filtresi YO
 -- IgnoreQueryFilters() ile:
 SELECT * FROM [Products];  -- Hiçbir filter yok
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- IgnoreQueryFilters(["SoftDelete"]) ile:
+SELECT * FROM products WHERE tenant_id = @tenantId;  -- is_deleted filtresi YOK
+
+-- IgnoreQueryFilters() ile:
+SELECT * FROM products;  -- Hiçbir filter yok
+\`\`\`
+
+</details>
 
 > 💡 **Migration notu:** EF Core 9'dan 10'a geçerken mevcut \`HasQueryFilter\` çağrılarınız çalışmaya devam eder. İsimli filter'lar opsiyoneldir — yalnızca seçici disable ihtiyacı olunca kullanın.
 
@@ -6281,6 +6691,9 @@ var categories = context.Categories
     .ToList();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF her iki tabloya da filter uygular:
 SELECT [c].*, [p].*
@@ -6288,6 +6701,21 @@ FROM [Categories] AS [c]
 LEFT JOIN [Products] AS [p] ON [p].[CategoryId] = [c].[Id] AND [p].[IsDeleted] = 0
 WHERE [c].[IsDeleted] = 0;
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF her iki tabloya da filter uygular:
+SELECT c.*, p.*
+FROM categories AS c
+LEFT JOIN products AS p ON p.category_id = c.id AND p.is_deleted = FALSE
+WHERE c.is_deleted = FALSE;
+\`\`\`
+
+</details>
 
 > ⚠️ **Required navigation + filter = silent data loss!**  
 > Eğer \`Product.CategoryId\` required ise ve Category soft-deleted ise → Product join'da kaybolur.  
@@ -6530,6 +6958,9 @@ public class BankAccountConfiguration : IEntityTypeConfiguration<BankAccount>
 
 **📌 Üretilen UPDATE:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Balance concurrency token olduğunda:
 UPDATE [BankAccounts]
@@ -6540,9 +6971,29 @@ WHERE [Id] = @p2 AND [Balance] = @p3;
 SELECT @@ROWCOUNT;  -- 0 → DbUpdateConcurrencyException
 \`\`\`
 
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Balance concurrency token olduğunda:
+UPDATE bank_accounts
+SET balance = @p0, last_modified = @p1
+WHERE id = @p2 AND balance = @p3;
+--                  ^^^^^^^^^^^^^^^^ orijinal değer eşleşmezse 0 satır!
+
+-- Etkilenen satır sayısı 0 ise → DbUpdateConcurrencyException
+\`\`\`
+
+</details>
+
 > ⚠️ \`IsConcurrencyToken()\` kullanılırsa değer otomatik artmaz — uygulamanın kendisi yeni değer atamalı. \`IsRowVersion()\` ise SQL Server tarafından otomatik yönetilir.
 
 ### 21.4 SQL'de Tam Çalışma Mekanizması
+
+<details>
+<summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
 -- EF'in SaveChanges() ile ürettiği sorgu (RowVersion):
@@ -6556,6 +7007,24 @@ WHERE @@ROWCOUNT = 1 AND [Id] = @p3;
 
 -- @@ROWCOUNT = 0 ise → kimse etkilenmedi → DbUpdateConcurrencyException!
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF'in SaveChanges() ile ürettiği sorgu (xmin concurrency token):
+UPDATE products
+SET name = @p0, price = @p1, stock = @p2
+WHERE id = @p3 AND xmin = @p4
+RETURNING xmin;              -- Yeni xmin değerini geri al
+
+-- Etkilenen satır 0 ise → DbUpdateConcurrencyException!
+-- PostgreSQL'de xmin, her UPDATE'te otomatik değişen transaction ID'dir
+\`\`\`
+
+</details>
 
 **📌 Zaman Çizelgesi Senaryosu:**
 
@@ -7251,6 +7720,9 @@ public class PagedResult<T>
 
 ### SQL Çıktısı (Offset)
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Sayfa 5, 20 kayıt/sayfa
 SELECT [p].[Id], [p].[Name], [p].[Price]
@@ -7264,6 +7736,27 @@ SELECT COUNT(*)
 FROM [Products] AS [p]
 WHERE [p].[IsActive] = 1;
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Sayfa 5, 20 kayıt/sayfa
+SELECT p.id, p.name, p.price
+FROM products AS p
+WHERE p.is_active = TRUE
+ORDER BY p.name
+LIMIT 20 OFFSET 80;
+
+-- Count sorgusu (ayrı çalışır)
+SELECT COUNT(*)
+FROM products AS p
+WHERE p.is_active = TRUE;
+\`\`\`
+
+</details>
 
 > ⚠️ **Offset sorunu:** \`OFFSET 1000000\` → SQL Server 1M satır tarar ve atar! Büyük veri setlerinde yavaşlar.
 
@@ -7351,6 +7844,9 @@ var products = await context.Products
 
 ### Oluşan SQL
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- ProductService.GetActiveProducts — Dashboard API
 
@@ -7359,6 +7855,22 @@ FROM [Products] AS [p]
 WHERE [p].[IsActive] = 1
 ORDER BY [p].[Name]
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- ProductService.GetActiveProducts — Dashboard API
+
+SELECT p.id, p.name, p.price
+FROM products AS p
+WHERE p.is_active = TRUE
+ORDER BY p.name
+\`\`\`
+
+</details>
 
 ### Çoklu Tag
 
@@ -7610,12 +8122,28 @@ await context.SaveChangesAsync();
 // EF Core otomatik batch yapar (varsayılan MaxBatchSize: 42 — SQL Server)
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF Core batched INSERT (tek roundtrip'te birden fazla INSERT):
 INSERT INTO [Products] ([Name], [Price]) VALUES (N'Product 1', 10);
 INSERT INTO [Products] ([Name], [Price]) VALUES (N'Product 2', 20);
 -- ... (batch halinde gönderilir, tek roundtrip)
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF Core batched INSERT (tek roundtrip'te birden fazla INSERT):
+INSERT INTO products (name, price) VALUES ('Product 1', 10), ('Product 2', 20);
+-- PostgreSQL multi-row VALUES ile tek statement'ta batch yapar
+\`\`\`
+
+</details>
 
 ---
 
@@ -7860,12 +8388,29 @@ catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
 }
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- SqlException 2601 tetikleyen SQL:
 INSERT INTO [Products] ([Sku], [Name]) VALUES ('EXISTING-SKU', 'Test');
 -- Msg 2601: Cannot insert duplicate key row in object 'Products' 
 -- with unique index 'IX_Products_Sku'.
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- PostgresException 23505 tetikleyen SQL:
+INSERT INTO products (sku, name) VALUES ('EXISTING-SKU', 'Test');
+-- ERROR: duplicate key value violates unique constraint "ix_products_sku"
+-- DETAIL: Key (sku)=(EXISTING-SKU) already exists.
+\`\`\`
+
+</details>
 
 ---
 
@@ -8088,12 +8633,29 @@ order.Tags.Add(new OrderTag { Name = "Express" });
 await context.SaveChangesAsync();
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF tüm JSON bloğunu UPDATE eder (partial update değil):
 UPDATE [Orders]
 SET [ShippingAddress] = N'{"Street":"Bağdat Cad. 42","City":"Ankara","PostalCode":"34710","Country":"Türkiye"}'
 WHERE [Id] = 1;
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF tüm JSON bloğunu UPDATE eder (partial update değil):
+UPDATE orders
+SET shipping_address = '{"Street":"Bağdat Cad. 42","City":"Ankara","PostalCode":"34710","Country":"Türkiye"}'::jsonb
+WHERE id = 1;
+\`\`\`
+
+</details>
 
 ### Nested (İç İçe) LINQ Sorguları
 
@@ -8799,12 +9361,31 @@ var overlapping = await context.Customers
 
 ### Oluşan SQL (TemporalAll)
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 SELECT [c].[Id], [c].[Name], [c].[Address], [c].[PeriodStart], [c].[PeriodEnd]
 FROM [dbo].[Customers] FOR SYSTEM_TIME ALL AS [c]
 WHERE [c].[Id] = 42
 ORDER BY [c].[PeriodStart]
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+> ⚠️ PostgreSQL'de \`FOR SYSTEM_TIME\` **yoktur**. Aşağıdaki trigger-based history tablosu ile benzer sonuç elde edilir:
+
+\`\`\`sql
+SELECT c.id, c.name, c.address, c.valid_from, c.valid_to
+FROM customers_history AS c
+WHERE c.id = 42
+ORDER BY c.valid_from;
+\`\`\`
+
+</details>
 
 ### Örnek Geçmiş Verisi
 
@@ -9381,18 +9962,34 @@ CREATE TABLE customer_contacts (
 Tek bir mantıksal tabloyu, fiziksel olarak birden fazla alt tabloya (**partition**) böler.
 Uygulama ve EF Core tek tablo görür — PostgreSQL arka planda doğru partition'a yönlendirir.
 
-\`\`\`
-┌──────────────────── orders (mantıksal tablo) ────────────────────┐
-│                                                                    │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐  │
-│  │ orders_2024 │  │ orders_2025 │  │ orders_2026 │  │ ...    │  │
-│  │ (2024 data) │  │ (2025 data) │  │ (2026 data) │  │        │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘  │
-└──────────────────────────────────────────────────────────────────┘
-
-SELECT * FROM orders WHERE order_date = '2026-05-18';
-→ PG sadece orders_2026 partition'ını tarar (Partition Pruning)
-\`\`\`
+<svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <marker id="arrowPruning" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect x="20" y="10" width="640" height="120" rx="6" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <text x="340" y="30" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="bold">orders (mantıksal tablo)</text>
+  <rect x="40" y="42" width="135" height="65" rx="4" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="107" y="68" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">orders_2024</text>
+  <text x="107" y="88" text-anchor="middle" fill="#94a3b8" font-size="9">(2024 data)</text>
+  <rect x="190" y="42" width="135" height="65" rx="4" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="257" y="68" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">orders_2025</text>
+  <text x="257" y="88" text-anchor="middle" fill="#94a3b8" font-size="9">(2025 data)</text>
+  <rect x="340" y="42" width="135" height="65" rx="4" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="2.5"/>
+  <text x="407" y="68" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="bold">orders_2026</text>
+  <text x="407" y="88" text-anchor="middle" fill="#fbbf24" font-size="9">(2026 data)</text>
+  <rect x="340" y="42" width="135" height="65" rx="4" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.5">
+    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="490" y="42" width="150" height="65" rx="4" fill="rgba(148,163,184,0.05)" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="565" y="78" text-anchor="middle" fill="#64748b" font-size="12">...</text>
+  <text x="30" y="160" fill="#f87171" font-size="10">SELECT &#42; FROM orders WHERE order_date = </text>
+  <text x="330" y="160" fill="#fbbf24" font-size="10" font-weight="bold">&#39;2026-05-18&#39;</text>
+  <text x="420" y="160" fill="#e2e8f0" font-size="10">;</text>
+  <path d="M407 148 L407 112" stroke="#fbbf24" stroke-width="1.5" fill="none" stroke-dasharray="3,2" marker-end="url(#arrowPruning)"/>
+  <text x="30" y="195" fill="#22c55e" font-size="10">&#8594; PG sadece orders_2026 partition tarar (Partition Pruning)</text>
+</svg>
 
 ### Partitioning Stratejileri
 
@@ -9984,6 +10581,9 @@ public class CascadeSoftDeleteInterceptor : SaveChangesInterceptor
 
 ### SQL — Normal vs Soft Delete Karşılaştırma
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- context.Products.Remove(product) → Interceptor araya girer:
 -- ❌ Fiziksel: DELETE FROM Products WHERE Id = 42
@@ -9992,6 +10592,22 @@ public class CascadeSoftDeleteInterceptor : SaveChangesInterceptor
 -- Normal sorgular otomatik filtrelenir:
 -- SELECT * FROM Products WHERE IsDeleted = 0  (filter otomatik eklenir)
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- context.Products.Remove(product) → Interceptor araya girer:
+-- ❌ Fiziksel: DELETE FROM products WHERE id = 42
+-- ✅ Soft:    UPDATE products SET is_deleted = TRUE, deleted_at = '2024-...', deleted_by = 'user1' WHERE id = 42
+
+-- Normal sorgular otomatik filtrelenir:
+-- SELECT * FROM products WHERE NOT is_deleted  (filter otomatik eklenir)
+\`\`\`
+
+</details>
 
 > 🐘 **PostgreSQL'de Soft Delete İpuçları:**
 > - **Partial Index** büyük avantaj: Silinmiş kayıtları index'ten **tamamen çıkar** → index küçülür, sorgular hızlanır
@@ -10777,6 +11393,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 }
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- DB'de şifreli olarak saklanır:
 SELECT [NationalId] FROM [Customers] WHERE [Id] = 1;
@@ -10785,6 +11404,22 @@ SELECT [NationalId] FROM [Customers] WHERE [Id] = 1;
 -- ⚠️ WHERE ile şifreli sütunda arama YAPILAMAZ:
 -- WHERE NationalId = '12345678901'  ← ÇALIŞMAZ (DB'de şifreli)
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- DB'de şifreli olarak saklanır:
+SELECT national_id FROM customers WHERE id = 1;
+-- Sonuç: 'FmK3x9...(base64 şifreli metin)...'
+
+-- ⚠️ WHERE ile şifreli sütunda arama YAPILAMAZ:
+-- WHERE national_id = '12345678901'  ← ÇALIŞMAZ (DB'de şifreli)
+\`\`\`
+
+</details>
 
 > ⚠️ **Kısıtlamalar:**  
 > - Şifreli sütunda \`WHERE\`, \`ORDER BY\`, \`INDEX\` **kullanılamaz** (DB şifreli metni görür)  
@@ -10807,21 +11442,37 @@ await context.SaveChangesAsync();
 
 **Perde arkasında olan:**
 
-\`\`\`
-┌─────────────────── READ ───────────────────┐
-│ DB: "FmK3x9...base64..."                   │
-│        ↓ Value Converter (Decrypt)          │
-│ C#: "12345678901"                           │
-└─────────────────────────────────────────────┘
-
-┌─────────────────── UPDATE ─────────────────┐
-│ C#: customer.NationalId = "98765432101"     │
-│        ↓ Value Converter (Encrypt)          │
-│ SQL: UPDATE Customers                       │
-│      SET NationalId = 'Xk7mP...(yeni)'     │
-│      WHERE Id = 1                           │
-└─────────────────────────────────────────────┘
-\`\`\`
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <marker id="arrowDown" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
+      <path d="M0,0 L8,0 L4,6" fill="#60a5fa"/>
+    </marker>
+  </defs>
+  <rect x="20" y="10" width="560" height="120" rx="6" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="300" y="30" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="bold">READ</text>
+  <text x="40" y="55" fill="#94a3b8" font-size="10">DB:</text>
+  <text x="65" y="55" fill="#f87171" font-size="10">&quot;FmK3x9...base64...&quot;</text>
+  <rect x="60" y="40" width="180" height="20" rx="3" fill="none" stroke="#f87171" stroke-width="0.5" opacity="0.4"/>
+  <text x="150" y="80" text-anchor="middle" fill="#60a5fa" font-size="10">&#8595; Value Converter (Decrypt)</text>
+  <path d="M150 62 L150 70" stroke="#60a5fa" stroke-width="1" marker-end="url(#arrowDown)"/>
+  <text x="40" y="110" fill="#94a3b8" font-size="10">C#:</text>
+  <text x="65" y="110" fill="#22c55e" font-size="10">&quot;12345678901&quot;</text>
+  <rect x="60" y="95" width="130" height="20" rx="3" fill="none" stroke="#22c55e" stroke-width="0.5" opacity="0.4"/>
+  <rect x="20" y="150" width="560" height="150" rx="6" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="300" y="170" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="bold">UPDATE</text>
+  <text x="40" y="195" fill="#94a3b8" font-size="10">C#:</text>
+  <text x="65" y="195" fill="#e2e8f0" font-size="10">customer.NationalId = </text>
+  <text x="250" y="195" fill="#22c55e" font-size="10">&quot;98765432101&quot;</text>
+  <text x="150" y="222" text-anchor="middle" fill="#60a5fa" font-size="10">&#8595; Value Converter (Encrypt)</text>
+  <text x="40" y="250" fill="#94a3b8" font-size="10">SQL:</text>
+  <text x="70" y="250" fill="#f87171" font-size="10" font-weight="bold">UPDATE</text>
+  <text x="125" y="250" fill="#e2e8f0" font-size="10">Customers</text>
+  <text x="70" y="270" fill="#f87171" font-size="10" font-weight="bold">SET</text>
+  <text x="100" y="270" fill="#e2e8f0" font-size="10">NationalId = </text>
+  <text x="205" y="270" fill="#fbbf24" font-size="10">&#39;Xk7mP...(yeni)&#39;</text>
+  <text x="70" y="290" fill="#f87171" font-size="10" font-weight="bold">WHERE</text>
+  <text x="115" y="290" fill="#e2e8f0" font-size="10">Id = 1</text>
+</svg>
 
 > 💡 **Key Rotation (Anahtar Değişimi)** durumunda tüm kayıtlar yeniden şifrelenmelidir:
 
@@ -10970,6 +11621,9 @@ public async Task<bool> ChangePassword(int userId, string currentPassword, strin
 
 **📌 SQL çıktısı:**
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- EF'in ürettiği UPDATE:
 UPDATE [Users]
@@ -10977,6 +11631,21 @@ SET [PasswordHash] = @p0,   -- Yeni hash (tamamen farklı bir string)
     [PasswordSalt] = @p1    -- Yeni salt (her seferinde random)
 WHERE [Id] = @p2;
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- EF'in ürettiği UPDATE:
+UPDATE users
+SET password_hash = @p0,   -- Yeni hash (tamamen farklı bir string)
+    password_salt = @p1    -- Yeni salt (her seferinde random)
+WHERE id = @p2;
+\`\`\`
+
+</details>
 
 **📌 Neden yeni salt?**  
 Her şifre değişikliğinde yeni salt üretilir. Aynı şifre bile farklı hash üretir → rainbow table saldırısını önler.
@@ -11016,6 +11685,9 @@ builder.Property(c => c.CreditCardNumber)
     .HasComment("MASKED WITH (FUNCTION = 'partial(0,\\"XXXX-XXXX-XXXX-\\",4)')");
 \`\`\`
 
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
 \`\`\`sql
 -- Migration sonrası SQL ile masking ekle:
 ALTER TABLE Customers ALTER COLUMN Email ADD MASKED WITH (FUNCTION = 'email()');
@@ -11030,6 +11702,28 @@ ALTER TABLE Customers ALTER COLUMN CreditCardNumber ADD MASKED WITH (FUNCTION = 
 -- Yetkili kullanıcı (UNMASK izni olan) orijinal veriyi görür:
 GRANT UNMASK TO [AppAdminUser];
 \`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- PostgreSQL'de native dynamic masking yok, VIEW + RLS ile benzer sonuç:
+CREATE VIEW customers_masked AS
+SELECT id, name,
+       LEFT(email, 1) || '***@' || SPLIT_PART(email, '@', 2) AS email,
+       '***-' || RIGHT(phone, 4) AS phone,
+       'XXXX-XXXX-XXXX-' || RIGHT(credit_card_number, 4) AS credit_card_number
+FROM customers;
+
+-- Row Level Security ile erişim kontrolü:
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON customers_masked TO app_user;
+-- Admin kullanıcı orijinal tabloyu doğrudan görebilir
+\`\`\`
+
+</details>
 
 ### 5. Application-Level Masking (Projection ile)
 
@@ -12040,6 +12734,18 @@ CREATE INDEX ix_products_category_id
                 content.classList.toggle('active', content.dataset.provider === provider);
             });
         });
+
+        // Toggle details panels based on provider
+        document.querySelectorAll('details').forEach(d => {
+            const summary = d.querySelector('summary');
+            if (!summary) return;
+            const text = summary.textContent;
+            if (text.includes('SQL Server')) {
+                d.open = (provider === 'sqlserver');
+            } else if (text.includes('PostgreSQL')) {
+                d.open = (provider === 'postgresql');
+            }
+        });
     }
 
     function buildToc() {
@@ -12383,7 +13089,7 @@ CREATE INDEX ix_products_category_id
     // ═══ Enhanced Search (headings + content) ═══
     let searchIndex = [];
     function buildSearchIndex() {
-        const sections = document.querySelectorAll('#content h2, #content h3');
+        const sections = document.querySelectorAll('#content h1, #content h2, #content h3');
         searchIndex = [];
         sections.forEach((heading, i) => {
             let textContent = '';
@@ -12396,7 +13102,7 @@ CREATE INDEX ix_products_category_id
             searchIndex.push({
                 id: heading.id,
                 title: heading.textContent.replace(/Temel|Orta|İleri|Uzman|Ref/g, '').trim(),
-                content: textContent.substring(0, 500).toLowerCase(),
+                content: textContent.substring(0, 2000).toLowerCase(),
                 heading: heading
             });
         });
@@ -12607,8 +13313,8 @@ CREATE INDEX ix_products_category_id
     document.addEventListener('DOMContentLoaded', () => {
         renderContent();
         setTimeout(() => {
-            lazyRenderSections();
             buildSearchIndex();
+            lazyRenderSections();
             enhanceActiveTocScroll();
             handleInitialHash();
         }, 100);
