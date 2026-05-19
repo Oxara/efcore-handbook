@@ -11881,8 +11881,52 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
             lazyRenderSections();
             buildSearchIndex();
             enhanceActiveTocScroll();
+            enableTocLazyNav();
         }, 100);
     });
+
+    // Force-render lazy sections when TOC link is clicked
+    function enableTocLazyNav() {
+        document.getElementById('tocLinks').addEventListener('click', (e) => {
+            const link = e.target.closest('a[href^="#"]');
+            if (!link) return;
+            const targetId = link.getAttribute('href').slice(1);
+            let targetEl = document.getElementById(targetId);
+            if (targetEl) return; // already in DOM, normal nav works
+
+            // Target not in DOM — find the placeholder that contains it and render
+            const placeholders = document.querySelectorAll('.section-lazy-placeholder');
+            for (const ph of placeholders) {
+                if (ph._elements && ph._elements.some(el => el.id === targetId || el.querySelector('#' + CSS.escape(targetId)))) {
+                    ph.dataset.loaded = 'true';
+                    ph.parentNode.insertBefore(ph._fragment, ph);
+                    ph.remove();
+                    break;
+                }
+            }
+
+            // If still not found, render ALL remaining placeholders (fallback)
+            targetEl = document.getElementById(targetId);
+            if (!targetEl) {
+                document.querySelectorAll('.section-lazy-placeholder').forEach(ph => {
+                    if (ph._fragment) {
+                        ph.parentNode.insertBefore(ph._fragment, ph);
+                        ph.remove();
+                    }
+                });
+            }
+
+            // Navigate after DOM update
+            requestAnimationFrame(() => {
+                const el = document.getElementById(targetId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                    history.replaceState(null, '', '#' + targetId);
+                }
+            });
+            e.preventDefault();
+        });
+    }
     </script>
 </body>
 </html>
