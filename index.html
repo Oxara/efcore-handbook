@@ -1607,6 +1607,28 @@ builder.HasIndex(p => p.Email)
        .UseCollation("und-x-icu");           // ICU collation
 \`\`\`
 
+> 💡 **PostgreSQL index seçim rehberi:**
+> | Index Metodu | Ne Zaman | Boyut | Performans |
+> |---|---|---|---|
+> | \`btree\` | Eşitlik + sıralama (varsayılan) | Orta | ✅ Genel amaç |
+> | \`hash\` | Sadece eşitlik (\`=\`) | Küçük | ✅ Hızlı ama kısıtlı |
+> | \`gin\` | Array \`@>\`, JSONB, Full-text \`@@\` | Büyük | ✅ Çok değerli aramalar |
+> | \`gist\` | Range, geometric, nearest-neighbor | Orta | ✅ Spatial/Range |
+> | \`brin\` | Büyük tabloda sıralı kolon (tarih) | Çok küçük | 🟡 Yaklaşık |
+
+> ⚠️ **Index Limitleri (PostgreSQL):**
+>
+> | Limit | Değer |
+> |-------|:---:|
+> | Max sütun/index (btree) | **32** |
+> | Max index boyutu (satır) | **2.712 byte** |
+> | Max index/tablo | **Sınır yok** (pratik: <50) |
+> | Max index adı | **63 karakter** |
+>
+> 💡 **Pratik öneriler:**
+> - Kullanılmayan index'leri tespit et: \`pg_stat_user_indexes\` → \`idx_scan = 0\` olanları kaldır
+> - GIN index büyük olabilir (tablo boyutunun 2-3 katı) — sadece gerçekten gerektiğinde ekle
+
 </details>
 
 > 💡 **Index ne zaman gerekir?**
@@ -1620,29 +1642,18 @@ builder.HasIndex(p => p.Email)
 > | Array/JSONB içinde arama | GIN index (PostgreSQL) |
 > | Büyük tabloda tarih filtresi | BRIN index (PostgreSQL) |
 
-> 💡 **PostgreSQL index seçim rehberi:**
-> | Index Metodu | Ne Zaman | Boyut | Performans |
-> |---|---|---|---|
-> | \`btree\` | Eşitlik + sıralama (varsayılan) | Orta | ✅ Genel amaç |
-> | \`hash\` | Sadece eşitlik (\`=\`) | Küçük | ✅ Hızlı ama kısıtlı |
-> | \`gin\` | Array \`@>\`, JSONB, Full-text \`@@\` | Büyük | ✅ Çok değerli aramalar |
-> | \`gist\` | Range, geometric, nearest-neighbor | Orta | ✅ Spatial/Range |
-> | \`brin\` | Büyük tabloda sıralı kolon (tarih) | Çok küçük | 🟡 Yaklaşık |
-
-> ⚠️ **Index Limitleri:**
->
-> | Limit | PostgreSQL | SQL Server |
-> |-------|:---:|:---:|
-> | Max sütun/index (btree) | **32** | 16 (include hariç) |
-> | Max index boyutu (satır) | **2.712 byte** | 1.700 byte |
-> | Max index/tablo | **Sınır yok** (pratik: <50) | Sınır yok (pratik: <50) |
-> | Max index adı | **63 karakter** | 128 karakter |
->
-> 💡 **Pratik öneriler:**
+> 💡 **Genel Index İpuçları:**
 > - Bir tabloda **5-15 index** idealdir. 30+ index → INSERT/UPDATE yavaşlar (her index güncellenmeli)
 > - Composite index'te sütun sırası kritik: **WHERE'de en seçici (selective) sütun önce** gelir
-> - Kullanılmayan index'leri tespit et: \`pg_stat_user_indexes\` → \`idx_scan = 0\` olanları kaldır
-> - GIN index büyük olabilir (tablo boyutunun 2-3 katı) — sadece gerçekten gerektiğinde ekle
+
+> ⚠️ **Index Limitleri (SQL Server):**
+>
+> | Limit | Değer |
+> |-------|:---:|
+> | Max sütun/index | **16** (include hariç) |
+> | Max index boyutu (satır) | **1.700 byte** |
+> | Max index/tablo | **Sınır yok** (pratik: <50) |
+> | Max index adı | **128 karakter** |
 
 # 🟡 ORTA SEVİYE
 
@@ -2722,6 +2733,9 @@ steps:
 | 20250120140000_AddOrdersTable | 8.0.1 |
 | 20250201091500_AddIndexToProducts | 8.0.1 |
 
+<details>
+<summary><b>🐘 PostgreSQL Migration Farkları</b></summary>
+
 > 🐘 **PostgreSQL Migration Farkları:**
 > - Komutlar aynı: \`dotnet ef migrations add\`, \`dotnet ef database update\`
 > - \`__EFMigrationsHistory\` tablosu PostgreSQL'de de aynı şekilde oluşur (\`public\` schema'da)
@@ -2765,6 +2779,8 @@ protected override void Up(MigrationBuilder migrationBuilder)
 > - \`UseSnakeCaseNamingConvention()\` eklediysen **ilk migration'dan önce** ekle, sonradan ekleme büyük rename migration'ı üretir
 > - Extension'lar (\`uuid-ossp\`, \`pg_trgm\`, \`hstore\`) ilk migration'da \`CREATE EXTENSION\` ile ekle
 > - PostgreSQL **transactional DDL** destekler → migration başarısız olursa otomatik ROLLBACK (SQL Server'da bu garanti değil!)
+
+</details>
 
 ---
 
@@ -5390,6 +5406,9 @@ builder.Property(p => p.Price)
 
 > 💡 **EF Core 8+:** \`PrimitiveCollection\` kullanıldığında ValueComparer otomatik atanır — manual tanımlamaya gerek kalmaz.
 
+<details>
+<summary><b>🐘 PostgreSQL Value Converter Farkları</b></summary>
+
 > 🐘 **PostgreSQL Value Converter Farkları:**
 > - **Native enum desteği:** PostgreSQL \`CREATE TYPE ... AS ENUM\` destekler — Value Converter gerekmez!
 > - **Native array:** \`List<string>\` → \`text[]\` (converter gereksiz, PG native halleder)
@@ -5429,6 +5448,8 @@ SELECT * FROM orders WHERE status = 'shipped';
 -- Geçersiz değer → DB hata verir (type safety)
 INSERT INTO orders (status) VALUES ('invalid'); -- ERROR!
 \`\`\`
+
+</details>
 
 > 💡 **Enum karşılaştırma:**
 > | Yaklaşım | SQL Server | PostgreSQL | Avantaj |
@@ -7182,10 +7203,11 @@ await context.BulkDeleteAsync(products);
 > |-------|:---:|:---:|---|
 > | Max parametre/sorgu | **65.535** | **2.100** | EF otomatik batch'ler |
 > | Max INSERT/batch (EF varsayılan) | **42** (Npgsql) | **42** | \`MaxBatchSize\` ile değiştir |
-> | \`COPY\` satır limiti | **Sınır yok** | — | PG bulk import en hızlı yol |
 > | Max transaction süresi (pratik) | **< 5 dakika** | **< 5 dakika** | Lock escalation, WAL şişmesi |
-> | Max WAL boyutu (checkpoint arası) | \`max_wal_size\` (1 GB) | — | Aşılırsa forced checkpoint |
->
+
+<details>
+<summary><b>🐘 PostgreSQL Bulk Insert — COPY Komutu</b></summary>
+
 > 💡 **Toplu insert performans rehberi (PostgreSQL):**
 >
 > | Kayıt Sayısı | Önerilen Yöntem | Neden |
@@ -7194,6 +7216,11 @@ await context.BulkDeleteAsync(products);
 > | 100 - 10.000 | \`SaveChanges\` + \`MaxBatchSize=100\` | Parametre limiti içinde |
 > | 10.000 - 1M | \`COPY\` komutu (Npgsql) | Binary protocol, en hızlı |
 > | > 1M | \`COPY\` + devre dışı index + transaction | Index rebuild sonradan |
+>
+> | Limit | Değer |
+> |-------|:---:|
+> | \`COPY\` satır limiti | **Sınır yok** (PG bulk import en hızlı yol) |
+> | Max WAL boyutu (checkpoint arası) | \`max_wal_size\` (1 GB varsayılan) |
 
 \`\`\`csharp
 // PostgreSQL COPY — en hızlı bulk insert yöntemi:
@@ -7216,6 +7243,8 @@ await writer.CompleteAsync();
 > - PostgreSQL'de uzun transaction WAL dosyalarını şişirir (disk dolabilir)
 > - VACUUM çalışamaz → dead tuple birikir → tablo şişer (table bloat)
 > - Kural: Batch işlemleri **500-5000 kayıt** bloklarına böl, her blokta COMMIT yap
+
+</details>
 
 ---
 
@@ -7540,6 +7569,9 @@ WHERE o.tags @> '[{"Name": "Acil"}]';  -- jsonb contains (GIN index destekli)
 > - Partial update yok — EF tüm JSON'u yeniden yazar (büyük JSON'da dikkat)
 > - SQLite ve eski MySQL JSON columns **desteklemez**
 
+<details>
+<summary><b>🐘 PostgreSQL JSON Avantajları</b></summary>
+
 > 🐘 **PostgreSQL JSON Avantajları:**
 > - SQL Server \`NVARCHAR(MAX)\` + \`JSON_VALUE()\` kullanırken, PostgreSQL **native \`jsonb\`** tipi kullanır
 > - \`jsonb\` binary formatta saklanır → parse overhead yok, sorgulama çok daha hızlı
@@ -7594,6 +7626,8 @@ WHERE shipping_address @> '{"City": "İstanbul"}';  -- Çok hızlı!
 > - Çok büyük JSON (>1 MB) → ayrı tabloya normalize et veya dosya storage kullan
 > - EF Core her update'te **tüm JSON'u** yeniden yazar — 500 KB'lık JSON'da bile her update 500 KB yazar!
 > - Deeply nested (>5 level) JSON → LINQ-to-SQL çevirisi karmaşıklaşır, performans düşer
+
+</details>
 
 ---
 
@@ -7754,6 +7788,9 @@ builder.Property(p => p.Tags)
 
 > 💡 Eğer koleksiyon üzerinden sık filtreleme/sıralama yapılıyorsa ve veri büyükse → ayrı tablo + index daha performanslı.
 
+<details>
+<summary><b>🐘 PostgreSQL Native Array Desteği</b></summary>
+
 > 🐘 **PostgreSQL Büyük Avantaj — Native Array Desteği:**
 > - SQL Server'da \`PrimitiveCollection\` → \`NVARCHAR(MAX)\` + \`OPENJSON\` ile sorgulanır (yavaş)
 > - PostgreSQL'de **native array tipi** vardır: \`text[]\`, \`int[]\`, \`uuid[]\` — JSON'a gerek yok!
@@ -7807,6 +7844,8 @@ WHERE array_length(liked_by_user_ids, 1) > 5  -- Count karşılığı
 \`\`\`
 
 > 💡 **Performans farkı:** SQL Server'da \`OPENJSON\` her sorgu için JSON parse eder. PostgreSQL'de native array operatörleri GIN index ile **O(1)** erişim sağlar — büyük veri setlerinde dramatik fark yaratır.
+
+</details>
 
 ---
 
@@ -8458,6 +8497,9 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 > - DbContext'te state tutmayın (her kullanımda sıfırlanır)
 > - \`OnConfiguring\` override etmeyin
 
+<details>
+<summary><b>🐘 PostgreSQL Connection & PgBouncer</b></summary>
+
 > ⚠️ **Connection & Pooling Limitleri:**
 >
 > | Limit | PostgreSQL | SQL Server |
@@ -8494,6 +8536,8 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 > ⚠️ **Yaygın hata:** "Npgsql.NpgsqlException: The connection pool has been exhausted"
 > - Sebep: Bağlantılar geri verilmiyor (DbContext Dispose edilmemiş veya long-running transaction)
 > - Çözüm: \`using\` kullan, DI lifetime doğru ayarla (Scoped), pool size artır
+
+</details>
 
 ---
 
@@ -9464,6 +9508,9 @@ var randomProducts = await context.Products
 | \`DataLength(col)\` | \`DATALENGTH(col)\` | Byte uzunluk |
 | \`Random()\` | \`NEWID()\` | Rastgele sıralama |
 
+<details>
+<summary><b>🐘 PostgreSQL EF.Functions (Npgsql Provider)</b></summary>
+
 > 🐘 **PostgreSQL EF.Functions (Npgsql Provider):**
 > - SQL Server'ın \`EF.Functions.DateDiffDay()\`, \`Contains()\`, \`IsNumeric()\` gibi fonksiyonları PostgreSQL'de **çalışmaz**
 > - Npgsql kendi \`EF.Functions\` setini sunar:
@@ -9533,6 +9580,8 @@ var random = await context.Products
 | Rastgele | \`NEWID()\` | \`random()\` |
 
 > 💡 **Full-Text Search:** SQL Server'da FTS Index + \`CONTAINS\` gerekir. PostgreSQL'de \`tsvector\` + \`GIN index\` ile çok daha esnek ve güçlü FTS yapılır — dil desteği (Turkish stemming dahil), ranking, highlight özellikleri built-in gelir.
+
+</details>
 
 ---
 
