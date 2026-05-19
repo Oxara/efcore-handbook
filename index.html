@@ -3,46 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EF Core Geliştirici El Kitabı — EF Core 8/9/10 Türkçe Referans</title>
-    <meta name="description" content="EF Core 8, 9 ve 10 için kapsamlı Türkçe geliştirici el kitabı. DbContext, Migrations, LINQ, Relationships, JSON Columns, Interceptors, Multi-Tenancy ve 45 bölüm daha. 205+ kod örneği ile.">
-    <meta name="keywords" content="EF Core, Entity Framework Core, EF Core 10, EF Core 9, EF Core 8, Türkçe, rehber, el kitabı, cheatsheet, DbContext, Migrations, LINQ, Fluent API, .NET">
-    <meta name="author" content="Erdem ÖZKARA, Oxara">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://oxara.github.io/efcore-handbook/">
-
-    <!-- Open Graph (Facebook, LinkedIn, Discord) -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="EF Core Geliştirici El Kitabı">
-    <meta property="og:description" content="EF Core 8/9/10 için kapsamlı Türkçe referans — 45 bölüm, 205+ kod örneği, SQL Server & PostgreSQL.">
-    <meta property="og:url" content="https://oxara.github.io/efcore-handbook/">
-    <meta property="og:locale" content="tr_TR">
-    <meta property="og:site_name" content="EF Core El Kitabı">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="EF Core Geliştirici El Kitabı">
-    <meta name="twitter:description" content="EF Core 8/9/10 kapsamlı Türkçe referans — 45 bölüm, 205+ C# örneği.">
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "TechArticle",
-      "headline": "EF Core Geliştirici El Kitabı",
-      "description": "Entity Framework Core 8, 9 ve 10 için kapsamlı Türkçe geliştirici referansı. 45 bölüm, 205+ kod örneği.",
-      "author": [
-        { "@type": "Person", "name": "Erdem ÖZKARA" },
-        { "@type": "Organization", "name": "Oxara" }
-      ],
-      "inLanguage": "tr",
-      "datePublished": "2026-05-19",
-      "dateModified": "2026-05-19",
-      "url": "https://oxara.github.io/efcore-handbook/",
-      "keywords": ["EF Core", "Entity Framework Core", ".NET", "C#", "ORM", "Türkçe"],
-      "proficiencyLevel": "Beginner to Expert"
-    }
-    </script>
-
+    <title>EF Core Geliştirici El Kitabı</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1213,8 +1174,6 @@ CREATE TABLE catalog.products (
 COMMENT ON TABLE catalog.products IS 'Ürün kataloğu tablosu';
 \`\`\`
 
-</details>
-
 > ⚠️ **PostgreSQL Case-Sensitivity Tuzağı:**
 > PostgreSQL'de tırnak (\`""\`) olmadan yazılan her identifier otomatik **lowercase'e** dönüştürülür.
 > EF Core varsayılanda C# isimleriyle (PascalCase) tablo oluşturur → her sorguda \`""\` zorunlu olur:
@@ -1248,6 +1207,8 @@ options.UseNpgsql(connectionString)
 // Schema belirtme (PostgreSQL)
 builder.ToTable("products", schema: "catalog");
 \`\`\`
+
+</details>
 
 ---
 
@@ -11881,52 +11842,8 @@ CREATE NONCLUSTERED INDEX [IX_Products_CategoryId]
             lazyRenderSections();
             buildSearchIndex();
             enhanceActiveTocScroll();
-            enableTocLazyNav();
         }, 100);
     });
-
-    // Force-render lazy sections when TOC link is clicked
-    function enableTocLazyNav() {
-        document.getElementById('tocLinks').addEventListener('click', (e) => {
-            const link = e.target.closest('a[href^="#"]');
-            if (!link) return;
-            const targetId = link.getAttribute('href').slice(1);
-            let targetEl = document.getElementById(targetId);
-            if (targetEl) return; // already in DOM, normal nav works
-
-            // Target not in DOM — find the placeholder that contains it and render
-            const placeholders = document.querySelectorAll('.section-lazy-placeholder');
-            for (const ph of placeholders) {
-                if (ph._elements && ph._elements.some(el => el.id === targetId || el.querySelector('#' + CSS.escape(targetId)))) {
-                    ph.dataset.loaded = 'true';
-                    ph.parentNode.insertBefore(ph._fragment, ph);
-                    ph.remove();
-                    break;
-                }
-            }
-
-            // If still not found, render ALL remaining placeholders (fallback)
-            targetEl = document.getElementById(targetId);
-            if (!targetEl) {
-                document.querySelectorAll('.section-lazy-placeholder').forEach(ph => {
-                    if (ph._fragment) {
-                        ph.parentNode.insertBefore(ph._fragment, ph);
-                        ph.remove();
-                    }
-                });
-            }
-
-            // Navigate after DOM update
-            requestAnimationFrame(() => {
-                const el = document.getElementById(targetId);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth' });
-                    history.replaceState(null, '', '#' + targetId);
-                }
-            });
-            e.preventDefault();
-        });
-    }
     </script>
 </body>
 </html>
