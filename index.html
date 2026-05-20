@@ -18,20 +18,20 @@
             --text: #e2e4e9;
             --text-secondary: #9ca3b4;
             --text-muted: #6b7280;
-            --accent: #6b8afd;
+            --accent: #7c8fb8;
             --accent-hover: #8da6ff;
             --accent-subtle: rgba(107, 138, 253, 0.08);
             --green: #34d399;
             --green-subtle: rgba(52, 211, 153, 0.08);
             --orange: #fb923c;
             --orange-subtle: rgba(251, 146, 60, 0.08);
-            --red: #f87171;
+            --red: #c76a6a;
             --red-subtle: rgba(248, 113, 113, 0.08);
-            --yellow: #fbbf24;
+            --yellow: #c4a44e;
             --border: rgba(255, 255, 255, 0.06);
             --border-strong: rgba(255, 255, 255, 0.1);
-            --tab-sql: #60a5fa;
-            --tab-pg: #4ade80;
+            --tab-sql: #7c9cbf;
+            --tab-pg: #6b9e7a;
             --code-bg: #12141d;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
@@ -905,13 +905,13 @@
 Bu doküman, **Entity Framework Core** ile çalışan .NET geliştiricileri için kapsamlı bir başvuru kaynağıdır. Başlangıç seviyesinden uzman konulara kadar kademeli bir öğrenme yolu sunar.
 
 **Nasıl kullanılır?**
-- 🟢 **Temel** — EF Core'a yeni başlıyorsanız buradan başlayın. DbContext, property, index temellerini kapsar.
-- 🟡 **Orta** — İlişkiler, migration, change tracking gibi günlük geliştirmede sürekli kullanacağınız konular.
+- 🟢 **Temel** — EF Core'a yeni başlıyorsan buradan başla. DbContext, property, index temelleri.
+- 🟡 **Orta** — İlişkiler, migration, change tracking gibi günlük geliştirmede sürekli kullanacağın konular.
 - 🟠 **İleri** — Owned entities, inheritance, concurrency, testing gibi mimari kararları etkileyen konular.
 - 🔴 **Uzman** — Interceptors, multi-tenancy, audit trail gibi production-grade pattern'lar.
 - 📋 **Referans** — Hızlı bakış tabloları, annotations özeti, provider karşılaştırması.
 
-**Her bölümde bulacaklarınız:** Fluent API kodu → üretilen SQL → açıklayıcı diyagram → pratik ipuçları → sık yapılan hatalar.
+**Her bölümde:** Fluent API kodu → üretilen SQL → açıklayıcı diyagram → pratik ipuçları → sık yapılan hatalar.
 
 > 💡 Örnekler **SQL Server** ve **PostgreSQL** üzerinden verilmiştir. Provider'a özgü farklar için → [Bölüm 41](#41-provider-uyumluluğu--sql-server-postgresql-oracle-sqlite)
 
@@ -921,7 +921,7 @@ Bu doküman, **Entity Framework Core** ile çalışan .NET geliştiricileri içi
 
 ## 1. DbContext & DbSet Kurulumu 🟢
 
-> **DbContext**, uygulama ile veritabanı arasındaki köprüdür. Her sorgu, her kayıt bu köprüden geçer.
+DbContext, uygulama ile veritabanı arasındaki köprüdür. Her sorgu, her kayıt bu köprüden geçer.
 
 ### Temel Kurulum
 
@@ -943,18 +943,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 \`\`\`
 
-> 💡 **Connection String parametreleri (SQL Server):**
-> | Parametre | Varsayılan | Açıklama |
-> |-----------|:---:|---|
-> | \`Server\` | — | Sunucu adı (\`.\` = localhost, \`.\\SQLEXPRESS\`) |
-> | \`Database\` | — | Veritabanı adı |
-> | \`Trusted_Connection\` | false | \`True\` → Windows Auth |
-> | \`User Id\` / \`Password\` | — | SQL Auth (Trusted_Connection=False ise) |
-> | \`TrustServerCertificate\` | false | Dev'de \`True\` (self-signed cert) |
-> | \`MultipleActiveResultSets\` | false | Nested reader'lar için (EF Core'da genelde gereksiz) |
-> | \`Encrypt\` | true (.NET 7+) | Bağlantı şifreleme |
-> | \`Connection Timeout\` | 15 | Bağlantı zaman aşımı (sn) |
-> | \`Max Pool Size\` | 100 | Connection pool boyutu |
+💡 **Connection String parametreleri (SQL Server):**
+| Parametre | Varsayılan | Açıklama |
+|-----------|:---:|---|
+| \`Server\` | — | Sunucu adı (\`.\` = localhost, \`.\\SQLEXPRESS\`) |
+| \`Database\` | — | Veritabanı adı |
+| \`Trusted_Connection\` | false | \`True\` → Windows Auth |
+| \`User Id\` / \`Password\` | — | SQL Auth (Trusted_Connection=False ise) |
+| \`TrustServerCertificate\` | false | Dev'de \`True\` (self-signed cert) |
+| \`MultipleActiveResultSets\` | false | Nested reader'lar için (EF Core'da genelde gereksiz) |
+| \`Encrypt\` | true (.NET 7+) | Bağlantı şifreleme |
+| \`Connection Timeout\` | 15 | Bağlantı zaman aşımı (sn) |
+| \`Max Pool Size\` | 100 | Connection pool boyutu |
 
 </details>
 
@@ -978,19 +978,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
            .UseSnakeCaseNamingConvention());  // Products → products, OrderDate → order_date
 \`\`\`
 
-> 💡 **Connection String parametreleri (Npgsql):**
-> | Parametre | Varsayılan | Açıklama |
-> |-----------|:---:|---|
-> | \`Host\` | localhost | Sunucu adresi |
-> | \`Port\` | 5432 | PostgreSQL portu |
-> | \`Database\` | — | Veritabanı adı |
-> | \`Username\` | — | Kullanıcı |
-> | \`Password\` | — | Şifre |
-> | \`SSL Mode\` | Prefer | \`Require\` → production'da zorunlu |
-> | \`Maximum Pool Size\` | 100 | İç havuz boyutu |
-> | \`Connection Idle Lifetime\` | 300 | Boş bağlantı ömrü (sn) |
-> | \`Include Error Detail\` | false | Dev'de \`true\` yap (detaylı hata) |
-> | \`Command Timeout\` | 30 | Sorgu zaman aşımı (sn) |
+💡 **Connection String parametreleri (Npgsql):**
+| Parametre | Varsayılan | Açıklama |
+|-----------|:---:|---|
+| \`Host\` | localhost | Sunucu adresi |
+| \`Port\` | 5432 | PostgreSQL portu |
+| \`Database\` | — | Veritabanı adı |
+| \`Username\` | — | Kullanıcı |
+| \`Password\` | — | Şifre |
+| \`SSL Mode\` | Prefer | \`Require\` → production'da zorunlu |
+| \`Maximum Pool Size\` | 100 | İç havuz boyutu |
+| \`Connection Idle Lifetime\` | 300 | Boş bağlantı ömrü (sn) |
+| \`Include Error Detail\` | false | Dev'de \`true\` yap (detaylı hata) |
+| \`Command Timeout\` | 30 | Sorgu zaman aşımı (sn) |
 
 > ⚠️ **Naming Convention:**  
 > PostgreSQL dünyasında standart \`snake_case\`'dir. \`UseSnakeCaseNamingConvention()\` olmadan EF Core, C#'taki \`PascalCase\` isimleri doğrudan kullanır → \`"Products"\` (tırnaklı). Bu, \`psql\`'de her seferinde çift tırnak yazmak zorunda bırakır.
@@ -1022,24 +1022,79 @@ public class AppDbContext : DbContext
 
 ### DbContext Yaşam Döngüsü & IDbContextFactory
 
-Lifetime yanlış ayarlanırsa: \`ObjectDisposedException\`, memory leak veya thread-safety hataları kaçınılmaz.
+DbContext'in ne zaman oluşup ne zaman yok edildiğini anlamak, memory leak ve thread-safety hatalarından korunmanın temelidir. \`AddDbContext\` varsayılan olarak **Scoped** kayıt yapar — her HTTP request'te bir instance oluşur, request bitince dispose edilir.
+
+#### Yaşam Döngüsü
+
+<svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
+    <rect x="130" y="5" width="160" height="30" rx="15" fill="#1e293b" stroke="#7c9cbf" stroke-width="1.5"/>
+    <text x="210" y="25" text-anchor="middle" fill="#7c9cbf" font-size="10" font-weight="600">HTTP Request başlar</text>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.3s" fill="freeze"/>
+    <line x1="210" y1="35" x2="210" y2="55" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="206,55 210,63 214,55" fill="#475569"/>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.5s" fill="freeze"/>
+    <rect x="60" y="65" width="300" height="65" rx="6" fill="#1e293b" stroke="#6b9e7a" stroke-width="1.5"/>
+    <text x="210" y="85" text-anchor="middle" fill="#6b9e7a" font-size="10" font-weight="600">new AppDbContext()</text>
+    <text x="210" y="103" text-anchor="middle" fill="#e2e8f0" font-size="8.5">Connection pool'dan bağlantı alınır</text>
+    <text x="210" y="118" text-anchor="middle" fill="#94a3b8" font-size="8">Change Tracker boş — hiçbir entity izlenmiyor</text>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.1s" dur="0.3s" fill="freeze"/>
+    <line x1="210" y1="130" x2="210" y2="150" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="206,150 210,158 214,150" fill="#475569"/>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.3s" dur="0.5s" fill="freeze"/>
+    <rect x="60" y="160" width="300" height="50" rx="6" fill="#1e293b" stroke="#c4a44e" stroke-width="1.5"/>
+    <text x="210" y="182" text-anchor="middle" fill="#c4a44e" font-size="10" font-weight="600">Controller / Service kullanır</text>
+    <text x="210" y="200" text-anchor="middle" fill="#94a3b8" font-size="8">Sorgular çalışır, entity'ler track edilir, SaveChanges çağrılır</text>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.7s" dur="0.3s" fill="freeze"/>
+    <line x1="210" y1="210" x2="210" y2="230" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="206,230 210,238 214,230" fill="#475569"/>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.9s" dur="0.5s" fill="freeze"/>
+    <rect x="60" y="240" width="300" height="65" rx="6" fill="#1e293b" stroke="#c76a6a" stroke-width="1.5"/>
+    <text x="210" y="260" text-anchor="middle" fill="#c76a6a" font-size="10" font-weight="600">Request biter → Dispose()</text>
+    <text x="210" y="278" text-anchor="middle" fill="#e2e8f0" font-size="8.5">Bağlantı pool'a geri verilir</text>
+    <text x="210" y="293" text-anchor="middle" fill="#94a3b8" font-size="8">Change Tracker temizlenir — bellek serbest kalır</text>
+  </g>
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.5s" dur="0.5s" fill="freeze"/>
+    <path d="M 45 80 C 25 80, 25 295, 45 295" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="3 2"/>
+    <text x="15" y="190" fill="#94a3b8" font-size="7.5" transform="rotate(-90,15,190)">Scoped Lifetime</text>
+  </g>
+</svg>
+
+#### Kayıt Yöntemleri
+
+| Yöntem | Ne zaman? | Nasıl? |
+|--------|-----------|--------|
+| \`AddDbContext\` | Controller, API endpoint | Her request'te otomatik oluşur/yok olur |
+| \`AddDbContextFactory\` | Background Service, Blazor Server, gRPC | \`factory.CreateDbContextAsync()\` ile manuel oluşturursun |
+| \`AddPooledDbContextFactory\` | Yüksek throughput | Context nesnesi havuzlanır, allocation azalır |
 
 <details>
 <summary><b>💾 SQL Server</b></summary>
 
 \`\`\`csharp
-// ✅ Varsayılan — Scoped (her HTTP request'te bir instance)
+// Scoped (varsayılan — Controller/API için)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// ❌ YANLIŞ — Singleton olarak kaydetme (thread-safe DEĞİL)
-builder.Services.AddSingleton<AppDbContext>();
-
-// Factory kayıt (Background Service / Blazor Server / gRPC için)
+// Factory (Background Service / Blazor Server için)
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Pooling ile (en iyi performans — context nesneleri havuzlanır)
+// Pooled Factory (yüksek throughput için)
 builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 \`\`\`
@@ -1050,37 +1105,31 @@ builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
 <summary><b>🐘 PostgreSQL</b></summary>
 
 \`\`\`csharp
-// ✅ Varsayılan — Scoped
+// Scoped (varsayılan — Controller/API için)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
            .UseSnakeCaseNamingConvention());
 
-// ❌ YANLIŞ — Singleton olarak kaydetme (thread-safe DEĞİL)
-builder.Services.AddSingleton<AppDbContext>();
-
-// Factory kayıt (Background Service / Blazor Server / gRPC için)
+// Factory (Background Service / Blazor Server için)
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
            .UseSnakeCaseNamingConvention());
 
-// Pooling ile (en iyi performans)
-// ⚠️ Npgsql kendi iç connection pool'u var — EF pooling ek optimizasyon sağlar
+// Pooled Factory (yüksek throughput için)
 builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
            .UseSnakeCaseNamingConvention());
 \`\`\`
 
-> 💡 **Npgsql vs EF Pool farkı:**  
-> Npgsql'in \`Maximum Pool Size\` → TCP bağlantılarını havuzlar.  
-> EF Core'un \`AddPooledDbContextFactory\` → DbContext **nesnesini** havuzlar (allocation azaltır).  
-> İkisi birlikte çalışır, birbirini ezmez.
+> 💡 Npgsql'in \`Maximum Pool Size\` → TCP bağlantılarını havuzlar. EF Core'un Pool'u → DbContext **nesnesini** havuzlar. İkisi birlikte çalışır.
 
 </details>
 
-**Background Service / Blazor Server / gRPC** gibi request dışı senaryolarda \`IDbContextFactory\` kullanılır:
+#### IDbContextFactory Kullanımı
+
+Request dışı senaryolarda (Background Service, Blazor Server, gRPC) context'i kendin oluşturup kendin dispose etmelisin:
 
 \`\`\`csharp
-// Background Service'de kullanım (her iki provider için aynı pattern)
 public class OrderProcessingService : BackgroundService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
@@ -1108,21 +1157,18 @@ public class OrderProcessingService : BackgroundService
 }
 \`\`\`
 
-| Senaryo | Doğru Yaklaşım |
-|---------|----------------|
-| Controller / API endpoint | \`AddDbContext\` (Scoped) |
-| Background Service / Timer | \`IDbContextFactory\` |
-| Blazor Server | \`IDbContextFactory\` |
-| Console App | \`new AppDbContext(options)\` veya Factory |
-| Paralel sorgular | Her iş için ayrı context (\`factory.CreateDbContextAsync()\`) |
+#### Dikkat Edilmesi Gerekenler
 
 \`\`\`csharp
-// ❌ Paralel sorgu aynı DbContext ile — ÇÖKER
+// ❌ DbContext'i Singleton olarak kaydetme — thread-safe DEĞİL
+builder.Services.AddSingleton<AppDbContext>();
+
+// ❌ Aynı DbContext ile paralel sorgu — ÇÖKER
 var task1 = context.Products.ToListAsync();
 var task2 = context.Orders.ToListAsync();
 await Task.WhenAll(task1, task2);  // 💥 DbContext thread-safe değil!
 
-// ✅ Her paralel iş için ayrı context
+// ✅ Paralel iş gerekiyorsa her biri için ayrı context
 await using var ctx1 = await factory.CreateDbContextAsync();
 await using var ctx2 = await factory.CreateDbContextAsync();
 await Task.WhenAll(ctx1.Products.ToListAsync(), ctx2.Orders.ToListAsync());
@@ -1132,7 +1178,9 @@ await Task.WhenAll(ctx1.Products.ToListAsync(), ctx2.Orders.ToListAsync());
 
 ## 2. IEntityTypeConfiguration — Ayrı Config Sınıfları 🟢
 
-**Tercih edilen yaklaşım** — büyük modellerde OnModelCreating'i şişirmez.
+Entity konfigürasyonlarını ayrı sınıflara ayırmak, DbContext'in \`OnModelCreating\` metodunu şişirmeden her entity'nin kurallarını kendi dosyasında yönetmeni sağlar. Proje büyüdükçe bakım kolaylığı için şart.
+
+#### Kullanım
 
 \`\`\`csharp
 // Ayrı config sınıfı
@@ -1153,21 +1201,25 @@ modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 modelBuilder.ApplyConfiguration(new ProductConfiguration());
 \`\`\`
 
-> 📁 **Dosya yapısı önerisi:**
-> \`\`\`
-> src/
-> └── MyApp.Infrastructure/
->     └── Persistence/
->         ├── AppDbContext.cs
->         └── Configurations/
->             ├── ProductConfiguration.cs
->             ├── CategoryConfiguration.cs
->             └── UserConfiguration.cs
-> \`\`\`
+📁 **Dosya yapısı önerisi:**
+\`\`\`
+src/
+└── MyApp.Infrastructure/
+    └── Persistence/
+        ├── AppDbContext.cs
+        └── Configurations/
+            ├── ProductConfiguration.cs
+            ├── CategoryConfiguration.cs
+            └── UserConfiguration.cs
+\`\`\`
 
 ---
 
 ## 3. Entity Type Configuration — Tablo / Şema 🟢
+
+Entity'nin hangi tabloya, hangi schema'ya map edileceğini belirler. Varsayılan olarak EF Core, DbSet adını tablo adı olarak kullanır. Farklı bir tablo adı, schema veya view'a yönlendirmek istediğinde bu ayarları kullanırsın.
+
+#### Fluent API
 
 \`\`\`csharp
 // Tablo adı belirleme
@@ -1268,6 +1320,10 @@ builder.ToTable("products", schema: "catalog");
 ---
 
 ## 4. Primary Key Yapılandırması 🟢
+
+Her tablonun bir primary key'i olmalıdır. EF Core, \`Id\` veya \`<EntityName>Id\` adlı property'yi otomatik PK olarak algılar. Farklı bir yapı istiyorsan (composite key, GUID, identity kontrolü) Fluent API ile belirtirsin.
+
+#### Fluent API
 
 \`\`\`csharp
 // Tek kolon PK
@@ -1371,19 +1427,23 @@ builder.Property(p => p.Id)
 
 </details>
 
-> 💡 **Ne zaman ne kullanılır?**
-> | Senaryo | Key Tipi |
-> |---------|----------|
-> | Genel CRUD uygulaması | \`int\` + IDENTITY |
-> | Dağıtık sistem / Microservice | \`Guid\` / \`UUID\` |
-> | Dışarıdan gelen veri (import) | \`ValueGeneratedNever\` |
-> | Ara tablo (join entity) | Composite PK |
+💡 **Ne zaman ne kullanılır?**
+| Senaryo | Key Tipi |
+|---------|----------|
+| Genel CRUD uygulaması | \`int\` + IDENTITY |
+| Dağıtık sistem / Microservice | \`Guid\` / \`UUID\` |
+| Dışarıdan gelen veri (import) | \`ValueGeneratedNever\` |
+| Ara tablo (join entity) | Composite PK |
 
 > ⚠️ **PostgreSQL UUID notu:** \`gen_random_uuid()\` sıralı değildir → B-tree index fragmentation'a dikkat. Alternatif: UUIDv7 (uygulama tarafında üretilen sıralı UUID, EF Core 8+ ile \`NewGuid()\` override).
 
 ---
 
 ## 5. Property (Sütun) Yapılandırması 🟢
+
+C# property'lerinin veritabanındaki sütunlara nasıl dönüşeceğini kontrol eder: veri tipi, uzunluk, null olup olmayacağı, varsayılan değer, computed column gibi. Konfigüre etmezsen EF Core convention'lara göre tahmin eder — ama production'da bunu şansa bırakma.
+
+#### Fluent API
 
 \`\`\`csharp
 // Zorunluluk
@@ -1531,21 +1591,25 @@ builder.Property(p => p.Description)
 | 2 | iPhone 15 | IPH-15 | 54999.00 | NULL | 1 | 2025-01-16 10:00:00 | iPhone 15 Pro |
 | 3 | AirPods Max | APM-01 | 12999.50 | Kablosuz kulaklık | 0 | 2025-02-01 14:20:00 | AirPods Max |
 
-> 💡 **PostgreSQL tip eşlemeleri:**
-> | C# / EF | SQL Server | PostgreSQL |
-> |---------|-----------|-----------|
-> | \`bool\` | \`BIT\` | \`BOOLEAN\` |
-> | \`DateTime\` | \`DATETIME2\` | \`TIMESTAMP\` |
-> | \`DateTimeOffset\` | \`DATETIMEOFFSET\` | \`TIMESTAMPTZ\` |
-> | \`string\` (max) | \`NVARCHAR(MAX)\` | \`TEXT\` |
-> | \`decimal\` | \`DECIMAL(p,s)\` | \`NUMERIC(p,s)\` |
-> | \`byte[]\` | \`VARBINARY(MAX)\` | \`BYTEA\` |
-> | \`Guid\` | \`UNIQUEIDENTIFIER\` | \`UUID\` |
-> | \`TimeSpan\` | \`TIME\` | \`INTERVAL\` |
+💡 **PostgreSQL tip eşlemeleri:**
+| C# / EF | SQL Server | PostgreSQL |
+|---------|-----------|-----------|
+| \`bool\` | \`BIT\` | \`BOOLEAN\` |
+| \`DateTime\` | \`DATETIME2\` | \`TIMESTAMP\` |
+| \`DateTimeOffset\` | \`DATETIMEOFFSET\` | \`TIMESTAMPTZ\` |
+| \`string\` (max) | \`NVARCHAR(MAX)\` | \`TEXT\` |
+| \`decimal\` | \`DECIMAL(p,s)\` | \`NUMERIC(p,s)\` |
+| \`byte[]\` | \`VARBINARY(MAX)\` | \`BYTEA\` |
+| \`Guid\` | \`UNIQUEIDENTIFIER\` | \`UUID\` |
+| \`TimeSpan\` | \`TIME\` | \`INTERVAL\` |
 
 ---
 
 ## 6. Index Yapılandırması 🟢
+
+Index, sorgu performansını doğrudan etkiler. \`WHERE\`, \`ORDER BY\` veya \`JOIN\` sık kullandığın sütunlara index koymak sorguyu tablonun tamamını taramaktan kurtarır. Ama her sütuna index koymak INSERT/UPDATE'i yavaşlatır — dengeli kullan.
+
+#### Fluent API
 
 \`\`\`csharp
 // Tek kolon index
@@ -1662,14 +1726,14 @@ builder.HasIndex(p => p.Email)
        .UseCollation("und-x-icu");           // ICU collation
 \`\`\`
 
-> 💡 **PostgreSQL index seçim rehberi:**
-> | Index Metodu | Ne Zaman | Boyut | Performans |
-> |---|---|---|---|
-> | \`btree\` | Eşitlik + sıralama (varsayılan) | Orta | ✅ Genel amaç |
-> | \`hash\` | Sadece eşitlik (\`=\`) | Küçük | ✅ Hızlı ama kısıtlı |
-> | \`gin\` | Array \`@>\`, JSONB, Full-text \`@@\` | Büyük | ✅ Çok değerli aramalar |
-> | \`gist\` | Range, geometric, nearest-neighbor | Orta | ✅ Spatial/Range |
-> | \`brin\` | Büyük tabloda sıralı kolon (tarih) | Çok küçük | 🟡 Yaklaşık |
+💡 **PostgreSQL index seçim rehberi:**
+| Index Metodu | Ne Zaman | Boyut | Performans |
+|---|---|---|---|
+| \`btree\` | Eşitlik + sıralama (varsayılan) | Orta | ✅ Genel amaç |
+| \`hash\` | Sadece eşitlik (\`=\`) | Küçük | ✅ Hızlı ama kısıtlı |
+| \`gin\` | Array \`@>\`, JSONB, Full-text \`@@\` | Büyük | ✅ Çok değerli aramalar |
+| \`gist\` | Range, geometric, nearest-neighbor | Orta | ✅ Spatial/Range |
+| \`brin\` | Büyük tabloda sıralı kolon (tarih) | Çok küçük | 🟡 Yaklaşık |
 
 > ⚠️ **Index Limitleri (PostgreSQL):**
 >
@@ -1686,20 +1750,16 @@ builder.HasIndex(p => p.Email)
 
 </details>
 
-> 💡 **Index ne zaman gerekir?**
-> | Durum | Index Tipi |
-> |-------|-----------|
-> | \`WHERE Email = ?\` sorgularında | Tek kolon index |
-> | Benzersiz olması gereken alan | Unique index |
-> | \`WHERE LastName = ? AND FirstName = ?\` | Bileşik index |
-> | Soft delete + unique | Filtered / Partial index |
-> | SELECT'te FK join sonrası extra sütun lazım | Covering index (INCLUDE) |
-> | Array/JSONB içinde arama | GIN index (PostgreSQL) |
-> | Büyük tabloda tarih filtresi | BRIN index (PostgreSQL) |
-
-> 💡 **Genel Index İpuçları:**
-> - Bir tabloda **5-15 index** idealdir. 30+ index → INSERT/UPDATE yavaşlar (her index güncellenmeli)
-> - Composite index'te sütun sırası kritik: **WHERE'de en seçici (selective) sütun önce** gelir
+💡 **Index ne zaman gerekir?**
+| Durum | Index Tipi |
+|-------|-----------|
+| \`WHERE Email = ?\` sorgularında | Tek kolon index |
+| Benzersiz olması gereken alan | Unique index |
+| \`WHERE LastName = ? AND FirstName = ?\` | Bileşik index |
+| Soft delete + unique | Filtered / Partial index |
+| SELECT'te FK join sonrası extra sütun lazım | Covering index (INCLUDE) |
+| Array/JSONB içinde arama | GIN index (PostgreSQL) |
+| Büyük tabloda tarih filtresi | BRIN index (PostgreSQL) |
 
 > ⚠️ **Index Limitleri (SQL Server):**
 >
@@ -1714,39 +1774,19 @@ builder.HasIndex(p => p.Email)
 
 ## 7. İlişki Yapılandırması (Relationships) 🟡
 
-> **Temel kural: İlişki her zaman FK'nın bulunduğu entity'nin config'inde tanımlanır.**
-> 
-> - Her entity'nin kendi config sınıfı olur.
-> - FK hangi tablodaysa ilişkiyi o config yazar, diğer taraf yazmaz.
-> - \`builder\` her zaman \`IEntityTypeConfiguration<T>\`'nin \`T\`'sini temsil eder.
+Entity'ler arası bağlantıları (One-to-One, One-to-Many, Many-to-Many) Fluent API ile tanımlar. Temel kural: ilişki her zaman FK'nın bulunduğu entity'nin config'inde yazılır. EF Core, JOIN ve Include sorgularını bu konfigürasyona göre üretir.
 
-> 📌 **EF Core İlişkisi vs Veritabanı FK Constraint — Bağımsız Çalışırlar**
->
-> EF Core, SQL üretirken (JOIN, Include, navigation) **yalnızca kendi model konfigürasyonuna** bakar.  
-> Veritabanında fiziksel FK constraint olup olmaması sorgu üretimini **etkilemez**.
->
-> | Durum | EF JOIN/Include çalışır mı? | Veri bütünlüğü garantisi |
-> |---|:---:|:---:|
-> | EF config ✅ + DB FK ✅ | ✅ | ✅ DB engeller |
-> | EF config ✅ + DB FK ❌ | ✅ | ❌ Orphan kayıt olabilir |
-> | EF config ❌ + DB FK ✅ | ❌ Navigation yok | ✅ DB engeller |
->
-> **Neden FK'sız çalışılır?** Legacy DB, microservice arası ilişki, yüksek write performansı.  
-> **Risk:** FK yoksa uygulama katmanı veri bütünlüğünü kendisi garanti etmeli.  
-> EF migration'da FK oluşmasını istemiyorsan:
-> \`\`\`csharp
-> builder.HasOne(p => p.Category)
->     .WithMany(c => c.Products)
->     .HasForeignKey(p => p.CategoryId)
->     .HasConstraintName(null)               // EF 7+: constraint ismi null → FK oluşmaz
->     // veya migration'dan sonra FK constraint'i drop et
-> \`\`\`
+> 📌 **Önemli:** EF Core ilişki çözümlemesi için **sadece kendi model konfigürasyonuna** bakar. Veritabanında fiziksel FK constraint olup olmaması sorgu üretimini etkilemez.
+
+| Durum | EF JOIN/Include çalışır mı? | Veri bütünlüğü garantisi |
+|---|:---:|:---:|
+| EF config ✅ + DB FK ✅ | ✅ | ✅ DB engeller |
+| EF config ✅ + DB FK ❌ | ✅ | ❌ Orphan kayıt olabilir |
+| EF config ❌ + DB FK ✅ | ❌ Navigation yok | ✅ DB engeller |
 
 ---
 
 ### One-to-One (Bire Bir)
-
-**📊 ER Diyagramı:**
 
 <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
@@ -1761,7 +1801,7 @@ builder.HasIndex(p => p.Email)
     <rect x="20" y="20" width="180" height="110" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="20" width="180" height="30" rx="4" fill="#334155"/>
     <text x="110" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Users</text>
-    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="160" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="160" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Name</text>
   </g>
 
@@ -1771,7 +1811,7 @@ builder.HasIndex(p => p.Email)
     <rect x="310" y="20" width="190" height="130" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="310" y="20" width="190" height="30" rx="4" fill="#334155"/>
     <text x="405" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">UserProfiles</text>
-    <text x="320" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="320" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="320" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Bio</text>
     <text x="320" y="105" fill="#7dd3fc" font-size="10.5">int UserId</text><text x="460" y="105" fill="#34d399" font-size="9">FK UQ</text>
   </g>
@@ -1910,8 +1950,6 @@ CREATE TABLE user_profiles (
 
 ### One-to-Many (Bire Çok)
 
-**📊 ER Diyagramı:**
-
 <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
     <marker id="arr-otm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -1925,7 +1963,7 @@ CREATE TABLE user_profiles (
     <rect x="20" y="30" width="180" height="110" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="30" width="180" height="30" rx="4" fill="#334155"/>
     <text x="110" y="50" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Categories</text>
-    <text x="30" y="75" fill="#7dd3fc" font-size="10.5">int Id</text><text x="160" y="75" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="75" fill="#7dd3fc" font-size="10.5">int Id</text><text x="160" y="75" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="95" fill="#7dd3fc" font-size="10.5">nvarchar Name</text>
   </g>
 
@@ -1935,7 +1973,7 @@ CREATE TABLE user_profiles (
     <rect x="310" y="20" width="190" height="130" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="310" y="20" width="190" height="30" rx="4" fill="#334155"/>
     <text x="405" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Products</text>
-    <text x="320" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="320" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="320" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Name</text>
     <text x="320" y="105" fill="#7dd3fc" font-size="10.5">int CategoryId</text><text x="460" y="105" fill="#34d399" font-size="9">FK</text>
   </g>
@@ -2075,13 +2113,9 @@ CREATE INDEX ix_products_category_id ON products (category_id);
 | 4 | Clean Code | 3 |
 | 5 | AirPods | 1 |
 
-> 💡 \`CategoryId = 1\` olan 3 ürün var — **bir** kategori **çok** ürün barındırır.
-
 ---
 
 ### Many-to-Many — Basit (EF Core 5+)
-
-**📊 ER Diyagramı:**
 
 <svg viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
 
@@ -2091,7 +2125,7 @@ CREATE INDEX ix_products_category_id ON products (category_id);
     <rect x="20" y="20" width="160" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="20" width="160" height="30" rx="4" fill="#334155"/>
     <text x="100" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Students</text>
-    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="145" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="145" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Name</text>
   </g>
 
@@ -2101,14 +2135,14 @@ CREATE INDEX ix_products_category_id ON products (category_id);
     <rect x="380" y="20" width="160" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="380" y="20" width="160" height="30" rx="4" fill="#334155"/>
     <text x="460" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Courses</text>
-    <text x="390" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="505" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="390" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="505" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="390" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Title</text>
   </g>
 
   <!-- CourseStudent Join Table -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.4s" fill="freeze"/>
-    <rect x="195" y="170" width="170" height="100" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2" stroke-dasharray="4,2"/>
+    <rect x="195" y="170" width="170" height="100" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2" stroke-dasharray="4,2"/>
     <rect x="195" y="170" width="170" height="30" rx="4" fill="#2d3a5c"/>
     <text x="280" y="190" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="600">CourseStudent</text>
     <text x="205" y="215" fill="#7dd3fc" font-size="10.5">int CoursesId</text><text x="330" y="215" fill="#34d399" font-size="9">FK</text>
@@ -2261,8 +2295,6 @@ CREATE TABLE course_student (
 | 2 | 3 | Mert → ASP.NET Core |
 | 3 | 2 | Zeynep → Veritabanı |
 
-> 💡 Ali 2 kursa kayıtlı, C# Temelleri kursunda 2 öğrenci var.
-
 ---
 
 ### Many-to-Many — Özel Join Entity ile
@@ -2279,7 +2311,7 @@ CREATE TABLE course_student (
     <rect x="20" y="20" width="160" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="20" width="160" height="30" rx="4" fill="#334155"/>
     <text x="100" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Students</text>
-    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="145" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="145" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Name</text>
   </g>
 
@@ -2289,18 +2321,18 @@ CREATE TABLE course_student (
     <rect x="380" y="20" width="160" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="380" y="20" width="160" height="30" rx="4" fill="#334155"/>
     <text x="460" y="40" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Courses</text>
-    <text x="390" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="505" y="65" fill="#fbbf24" font-size="9">PK</text>
+    <text x="390" y="65" fill="#7dd3fc" font-size="10.5">int Id</text><text x="505" y="65" fill="#c4a44e" font-size="9">PK</text>
     <text x="390" y="85" fill="#7dd3fc" font-size="10.5">nvarchar Title</text>
   </g>
 
   <!-- StudentCourses Join Entity -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.4s" fill="freeze"/>
-    <rect x="175" y="170" width="210" height="115" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="175" y="170" width="210" height="115" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <rect x="175" y="170" width="210" height="30" rx="4" fill="#2d3a5c"/>
     <text x="280" y="190" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="600">StudentCourses</text>
-    <text x="185" y="215" fill="#7dd3fc" font-size="10.5">int StudentId</text><text x="345" y="215" fill="#fbbf24" font-size="8">PK,FK</text>
-    <text x="185" y="235" fill="#7dd3fc" font-size="10.5">int CourseId</text><text x="345" y="235" fill="#fbbf24" font-size="8">PK,FK</text>
+    <text x="185" y="215" fill="#7dd3fc" font-size="10.5">int StudentId</text><text x="345" y="215" fill="#c4a44e" font-size="8">PK,FK</text>
+    <text x="185" y="235" fill="#7dd3fc" font-size="10.5">int CourseId</text><text x="345" y="235" fill="#c4a44e" font-size="8">PK,FK</text>
     <text x="185" y="255" fill="#7dd3fc" font-size="10.5">datetime2 EnrolledAt</text>
   </g>
 
@@ -2439,8 +2471,6 @@ CREATE TABLE student_courses (
 
 ### İlişki Özet Tablosu
 
-**Kural: FK hangi tablodaysa ilişkiyi o config yazar. Diğer taraf yazmaz.**
-
 | İlişki tipi | FK nerede | İlişkiyi kim yazar | Generic gerekli mi? |
 | --- | --- | --- | --- |
 | **1-1** | \`UserProfile.UserId\` | \`UserProfileConfiguration\` | ✅ Evet — EF hangi tarafın FK taşıdığını bilemez |
@@ -2497,22 +2527,22 @@ INSERT INTO OrderItems (Id, OrderId) VALUES (20, 999);       -- ❌ FK hata (Ord
 >   - \`NO ACTION\` → transaction sonunda kontrol edilir (deferrable)
 > - **Deferrable FK** → constraint kontrolünü transaction sonuna erteleyebilme özelliği
 
-> 📖 **Deferrable FK Nedir?**
-> Normal FK constraint, INSERT/UPDATE anında **hemen** kontrol edilir. Deferrable FK ise kontrolü transaction'ın **COMMIT** anına erteler.
->
-> **Ne işe yarar?**
-> - **Circular reference** senaryolarında: A tablosu B'ye, B tablosu A'ya referans veriyorsa → hangi kaydı önce eklersin? Normal FK'da imkansız!
-> - **Bulk data loading:** Binlerce ilişkili kaydı sıra dert etmeden tek transaction'da ekle, COMMIT'te hepsi kontrol edilsin
-> - **Data migration:** Eski sistemden veri taşırken FK sırasını düşünmene gerek kalmaz
->
-> **Modları:**
-> | Mod | Açıklama |
-> |-----|----------|
-> | \`NOT DEFERRABLE\` | Varsayılan — her satır anında kontrol edilir |
-> | \`DEFERRABLE INITIALLY IMMEDIATE\` | Varsayılan olarak anında, ama \`SET CONSTRAINTS ... DEFERRED\` ile ertelenebilir |
-> | \`DEFERRABLE INITIALLY DEFERRED\` | Varsayılan olarak transaction COMMIT'te kontrol eder |
->
-> ⚠️ **Dezavantaj:** Hata geç fark edilir — COMMIT anında FK violation alırsın, hangi INSERT'in soruna yol açtığını bulmak zorlaşır.
+📖 **Deferrable FK Nedir?**
+Normal FK constraint, INSERT/UPDATE anında **hemen** kontrol edilir. Deferrable FK ise kontrolü transaction'ın **COMMIT** anına erteler.
+
+**Ne işe yarar?**
+- **Circular reference** senaryolarında: A tablosu B'ye, B tablosu A'ya referans veriyorsa → hangi kaydı önce eklersin? Normal FK'da imkansız!
+- **Bulk data loading:** Binlerce ilişkili kaydı sıra dert etmeden tek transaction'da ekle, COMMIT'te hepsi kontrol edilsin
+- **Data migration:** Eski sistemden veri taşırken FK sırasını düşünmene gerek kalmaz
+
+**Modları:**
+| Mod | Açıklama |
+|-----|----------|
+| \`NOT DEFERRABLE\` | Varsayılan — her satır anında kontrol edilir |
+| \`DEFERRABLE INITIALLY IMMEDIATE\` | Varsayılan olarak anında, ama \`SET CONSTRAINTS ... DEFERRED\` ile ertelenebilir |
+| \`DEFERRABLE INITIALLY DEFERRED\` | Varsayılan olarak transaction COMMIT'te kontrol eder |
+
+⚠️ **Dezavantaj:** Hata geç fark edilir — COMMIT anında FK violation alırsın, hangi INSERT'in soruna yol açtığını bulmak zorlaşır.
 
 \`\`\`sql
 -- PostgreSQL: Deferrable FK (SQL Server'da yok!)
@@ -2549,17 +2579,13 @@ migrationBuilder.Sql(@"
 ");
 \`\`\`
 
-> 💡 **snake_case convention kullanıyorsan:** FK constraint isimleri de snake_case olur:
-> \`fk_order_items_orders_order_id\` (SQL Server: \`FK_OrderItems_Orders_OrderId\`)
-
 </details>
 
 ---
 
 ## 8. Migrations (Göçler) 🟡
 
-> **Migration**, C# modelindeki değişiklikleri SQL Server'a taşıyan versiyonlama sistemidir.  
-> Git commit'leri gibi — her migration bir "DB commit" olarak düşünülebilir.
+C# modelinde yaptığın her değişikliği (yeni tablo, sütun ekleme, tip değiştirme) veritabanına taşıyan versiyonlama sistemidir. Git commit'leri gibi düşün — her migration bir "DB commit". Geri alabilir, script üretebilir, CI/CD'ye entegre edebilirsin.
 
 ---
 
@@ -2701,12 +2727,6 @@ public partial class InitialCreate : Migration
 \`\`\`
 
 </details>
-
-> 💡 **İpuçları:**
-> - \`Up()\` → ileri (tabloları oluşturur)
-> - \`Down()\` → geri (tabloları siler) — rollback için
-> - Production'da \`dotnet ef migrations script --idempotent\` ile SQL üret, DBA'ya ver
-> - PostgreSQL **transactional DDL** destekler → migration başarısız olursa otomatik ROLLBACK (SQL Server'da bu garanti değil!)
 
 ---
 
@@ -2889,10 +2909,11 @@ protected override void Up(MigrationBuilder migrationBuilder)
 
 ## 9. Seed Data (Başlangıç Verisi) 🟡
 
-### HasData — Migration-Based Seed
+Veritabanı ilk oluştuğunda veya test ortamında ihtiyaç duyulan başlangıç verilerini (kategoriler, roller, ülke listesi gibi) otomatik eklemek için kullanılır. İki yaklaşım var: migration-based (HasData) ve runtime-based (UseSeeding).
 
-> **HasData**, migration içinde sabit (statik) veri eklemek için kullanılır.  
-> Lookup tabloları, enum değerleri, sabit referans verisi gibi senaryolar için.
+---
+
+### HasData — Migration-Based Seed
 
 > ⚠️ **Kritik:** HasData **runtime'da çalışmaz**. Migration dosyasına SQL olarak yazılır ve migration **sadece bir kez** uygulanır.  
 > - Kayıt zaten varsa → tekrar eklenmez (migration bir daha çalışmaz)  
@@ -2975,8 +2996,6 @@ builder.OwnsOne(c => c.Address).HasData(
 \`\`\`
 
 ### UseSeeding — Koşullu Seed (EF Core 9+)
-
-\`HasData\` migration'a bağlıdır ve statiktir. **EF Core 9** ile gelen \`UseSeeding\`, runtime'da koşullu ve async seed yapabilir:
 
 | Özellik | HasData | UseSeeding (EF Core 9+) |
 |---------|---------|-------------------------|
@@ -3074,8 +3093,82 @@ await context.Database.ExecuteSqlRawAsync(@"
 
 ## 10. Loading Strategies (Veri Yükleme) 🟡
 
-> İlişkili verileri ne zaman ve nasıl çekeceğimizi belirleyen stratejiler.  
-> Yanlış tercih = N+1 problemi = performans felaketi.
+Bir entity'yi çektiğinde ilişkili verileri (navigation property'ler) ne zaman ve nasıl yükleyeceğini belirler. Yanlış tercih N+1 problemine yol açar — yüzlerce gereksiz sorgu. Doğru tercih uygulamanın hızını belirler.
+
+---
+
+### � Loading Stratejileri: Karar Ağacı
+
+<svg viewBox="0 0 500 340" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <!-- Question 1 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
+    <rect x="140" y="5" width="220" height="35" rx="6" fill="#1e293b" stroke="#7c9cbf" stroke-width="1.5"/>
+    <text x="250" y="27" text-anchor="middle" fill="#7c9cbf" font-size="9" font-weight="600">Entity'yi değiştirip kaydedecek misin?</text>
+  </g>
+  <!-- Arrows from Q1 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.3s" fill="freeze"/>
+    <line x1="190" y1="40" x2="130" y2="70" stroke="#6b9e7a" stroke-width="1.2"/>
+    <text x="140" y="55" fill="#6b9e7a" font-size="8" font-weight="600">EVET</text>
+    <line x1="310" y1="40" x2="370" y2="70" stroke="#c4a44e" stroke-width="1.2"/>
+    <text x="340" y="55" fill="#c4a44e" font-size="8" font-weight="600">HAYIR</text>
+  </g>
+  <!-- Left branch: Include -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.9s" dur="0.4s" fill="freeze"/>
+    <rect x="30" y="72" width="200" height="45" rx="6" fill="#1e293b" stroke="#6b9e7a" stroke-width="1.5"/>
+    <text x="130" y="92" text-anchor="middle" fill="#6b9e7a" font-size="9.5" font-weight="600">Include() kullan</text>
+    <text x="130" y="108" text-anchor="middle" fill="#94a3b8" font-size="7.5">Entity track edilir → SaveChanges çalışır</text>
+  </g>
+  <!-- Right branch: Projection -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.9s" dur="0.4s" fill="freeze"/>
+    <rect x="270" y="72" width="200" height="45" rx="6" fill="#1e293b" stroke="#c4a44e" stroke-width="1.5"/>
+    <text x="370" y="92" text-anchor="middle" fill="#c4a44e" font-size="9.5" font-weight="600">Select() ile Projection</text>
+    <text x="370" y="108" text-anchor="middle" fill="#94a3b8" font-size="7.5">En hızlı — sadece ihtiyacın olan sütunlar</text>
+  </g>
+  <!-- Arrow from Include to Q2 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.3s" dur="0.3s" fill="freeze"/>
+    <line x1="130" y1="117" x2="130" y2="145" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="126,145 130,153 134,145" fill="#475569"/>
+  </g>
+  <!-- Question 2 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.5s" dur="0.4s" fill="freeze"/>
+    <rect x="20" y="155" width="220" height="35" rx="6" fill="#1e293b" stroke="#9b8abf" stroke-width="1.5"/>
+    <text x="130" y="177" text-anchor="middle" fill="#9b8abf" font-size="8.5" font-weight="600">Birden fazla koleksiyon Include?</text>
+  </g>
+  <!-- Arrows from Q2 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.9s" dur="0.3s" fill="freeze"/>
+    <line x1="80" y1="190" x2="60" y2="220" stroke="#6b9e7a" stroke-width="1.2"/>
+    <text x="50" y="210" fill="#6b9e7a" font-size="7.5" font-weight="600">EVET</text>
+    <line x1="180" y1="190" x2="200" y2="220" stroke="#c4a44e" stroke-width="1.2"/>
+    <text x="192" y="210" fill="#c4a44e" font-size="7.5" font-weight="600">HAYIR</text>
+  </g>
+  <!-- AsSplitQuery -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.2s" dur="0.4s" fill="freeze"/>
+    <rect x="5" y="225" width="140" height="45" rx="6" fill="#1e293b" stroke="#6b9e7a" stroke-width="1.5"/>
+    <text x="75" y="245" text-anchor="middle" fill="#6b9e7a" font-size="9" font-weight="600">AsSplitQuery()</text>
+    <text x="75" y="261" text-anchor="middle" fill="#94a3b8" font-size="7">Her Include ayrı SQL olur</text>
+  </g>
+  <!-- Single Query -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.2s" dur="0.4s" fill="freeze"/>
+    <rect x="155" y="225" width="140" height="45" rx="6" fill="#1e293b" stroke="#c4a44e" stroke-width="1.5"/>
+    <text x="225" y="245" text-anchor="middle" fill="#c4a44e" font-size="9" font-weight="600">Tek sorgu (varsayılan)</text>
+    <text x="225" y="261" text-anchor="middle" fill="#94a3b8" font-size="7">Tek bir JOIN ile çözülür</text>
+  </g>
+  <!-- Summary box -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.8s" dur="0.5s" fill="freeze"/>
+    <rect x="30" y="290" width="440" height="40" rx="5" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+    <text x="250" y="314" text-anchor="middle" fill="#c4a44e" font-size="8.5">💡 %80 kuralı: Sadece okuyup JSON dönüyorsan → Select() | Değiştirip kaydedeceksen → Include()</text>
+  </g>
+</svg>
 
 ---
 
@@ -3530,11 +3623,41 @@ WHERE p.is_active = TRUE;
 > EF'teki config'in görevi: **sorgu üretimi** (JOIN, Include, navigation).  
 > İkisi birbirinden bağımsız çalışır.
 
+### 🔍 N+1 Problemini Tespit Etme
+
+N+1, production'da en sık karşılaşılan performans sorunudur. Tespit etmenin en kolay yolu EF Core'un log'unu açmak:
+
+\`\`\`csharp
+// Program.cs veya DbContext'te
+optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+
+// Sonra Output penceresinde SQL satırlarını say:
+// 1 sorgu = normal
+// 101 sorgu (1 ana + 100 tekrar eden) = N+1 problemi!
+\`\`\`
+
+> 🛠️ **Araç önerisi:** MiniProfiler — her sayfanın üstünde kaç SQL çalıştığını gösterir. Geliştirme sırasında paha biçilmez.
+
 ---
 
 ## 11. Change Tracking & Performance 🟡
 
-> EF Core her entity'nin durumunu izler. Bunu bilmek performans için kritiktir.
+EF Core, DB'den çektiğin her entity'nin o anki değerlerini bir **kopya** olarak saklar. \`SaveChanges()\` dediğinde eski ve yeni değerleri karşılaştırır, sadece değişen alanlar için UPDATE üretir. Bu mekanizmayı anlamak gereksiz sorguları önlemenin ve performansı artırmanın temelidir.
+
+#### Nasıl Çalışır?
+
+\`\`\`csharp
+var product = context.Products.First(p => p.Id == 1);
+// EF: "Price=100 olarak kaydettim"
+
+product.Price = 150;
+await context.SaveChangesAsync();
+// EF: "Price 100'den 150'ye değişmiş, Name aynı kalmış"
+// → UPDATE Products SET Price = 150 WHERE Id = 1
+// Sadece Price güncellenir! Name SQL'e dahil olmaz.
+\`\`\`
+
+> 🔑 Bu sayede EF Core gereksiz sütun güncellemesi yapmaz — hem ağ trafiği azalır hem de DB'deki index'ler gereksiz yere yeniden yazılmaz.
 
 ---
 
@@ -3549,8 +3672,6 @@ WHERE p.is_active = TRUE;
 | \`Detached\` | EF izlemiyor | Hiçbir şey |
 
 ### 11.2 Yeni Entity Ekleme (Add)
-
-Entity henüz DB'de yok, EF onu **izlemiyor** (Detached). \`context.Add()\` ile **Added** state'e geçer. \`SaveChanges()\` çağrılınca \`INSERT\` SQL üretilir ve state **Unchanged** olur.
 
 <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
@@ -3576,7 +3697,7 @@ Entity henüz DB'de yok, EF onu **izlemiyor** (Detached). \`context.Add()\` ile 
   <!-- Added box -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <rect x="284" y="40" width="110" height="36" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="284" y="40" width="110" height="36" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <text x="339" y="63" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="600">Added</text>
   </g>
 
@@ -3605,8 +3726,6 @@ await context.SaveChangesAsync();       // INSERT → State: Unchanged
 ---
 
 ### 11.3 Mevcut Entity İzlemeye Alma (Attach)
-
-Zaten DB'de var ama EF izlemiyor (örn. API'den gelen entity). \`context.Attach()\` ile direkt **Unchanged** state'e geçer. SQL üretilmez, sadece Change Tracker'a kayıt olur.
 
 <svg viewBox="0 0 480 90" xmlns="http://www.w3.org/2000/svg" style="max-width:480px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
@@ -3646,8 +3765,6 @@ context.Attach(product);                // State: Unchanged — SQL yok
 
 ### 11.4 Property Değiştirme → Update
 
-Tracked bir entity'nin property'si değiştirilince otomatik **Modified** olur. \`SaveChanges()\` sadece değişen sütunlar için \`UPDATE\` üretir.
-
 <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
     <marker id="arr-mod" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -3674,7 +3791,7 @@ Tracked bir entity'nin property'si değiştirilince otomatik **Modified** olur. 
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
     <rect x="100" y="104" width="120" height="36" rx="4" fill="#1e293b" stroke="#fb923c" stroke-width="1.2"/>
-    <text x="160" y="127" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Modified</text>
+    <text x="160" y="127" text-anchor="middle" fill="#c4a44e" font-size="11" font-weight="600">Modified</text>
   </g>
 
   <!-- Arrow down to Unchanged -->
@@ -3703,8 +3820,6 @@ await context.SaveChangesAsync();                   // UPDATE → State: Unchang
 
 ### 11.5 Silme (Remove)
 
-Tracked entity \`context.Remove()\` ile **Deleted** state'e geçer. \`SaveChanges()\` → \`DELETE\` çalışır → entity artık **Detached** (EF izlemiyor).
-
 <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
     <marker id="arr-del" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -3723,14 +3838,14 @@ Tracked entity \`context.Remove()\` ile **Deleted** state'e geçer. \`SaveChange
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.3s" fill="freeze"/>
     <line x1="160" y1="46" x2="160" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr-del)"/>
-    <text x="250" y="75" fill="#f87171" font-size="9">context.Remove(entity)</text>
+    <text x="250" y="75" fill="#c76a6a" font-size="9">context.Remove(entity)</text>
   </g>
 
   <!-- Deleted -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <rect x="100" y="104" width="120" height="36" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.2"/>
-    <text x="160" y="127" text-anchor="middle" fill="#f87171" font-size="11" font-weight="600">Deleted</text>
+    <rect x="100" y="104" width="120" height="36" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.2"/>
+    <text x="160" y="127" text-anchor="middle" fill="#c76a6a" font-size="11" font-weight="600">Deleted</text>
   </g>
 
   <!-- Arrow down to Detached -->
@@ -3781,7 +3896,7 @@ await context.SaveChangesAsync();                   // DELETE → State: Detache
 
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.3s" fill="freeze"/>
-    <rect x="134" y="20" width="72" height="30" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1"/>
+    <rect x="134" y="20" width="72" height="30" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1"/>
     <text x="170" y="39" text-anchor="middle" fill="#a5b4fc" font-size="9">Added</text>
   </g>
 
@@ -3800,13 +3915,13 @@ await context.SaveChangesAsync();                   // DELETE → State: Detache
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.3s" dur="0.3s" fill="freeze"/>
     <line x1="344" y1="35" x2="396" y2="35" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arr-sum)"/>
-    <text x="370" y="28" text-anchor="middle" fill="#fbbf24" font-size="7.5">Modify</text>
+    <text x="370" y="28" text-anchor="middle" fill="#c4a44e" font-size="7.5">Modify</text>
   </g>
 
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.5s" dur="0.3s" fill="freeze"/>
     <rect x="400" y="20" width="80" height="30" rx="4" fill="#1e293b" stroke="#fb923c" stroke-width="1"/>
-    <text x="440" y="39" text-anchor="middle" fill="#fbbf24" font-size="9">Modified</text>
+    <text x="440" y="39" text-anchor="middle" fill="#c4a44e" font-size="9">Modified</text>
   </g>
 
   <g opacity="0">
@@ -3838,9 +3953,9 @@ await context.SaveChangesAsync();                   // DELETE → State: Detache
     <rect x="254" y="140" width="90" height="30" rx="4" fill="#1e293b" stroke="#34d399" stroke-width="1"/>
     <text x="299" y="159" text-anchor="middle" fill="#86efac" font-size="9">Unchanged</text>
     <line x1="344" y1="155" x2="396" y2="155" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arr-sum)"/>
-    <text x="370" y="148" text-anchor="middle" fill="#f87171" font-size="7.5">Remove</text>
-    <rect x="400" y="140" width="80" height="30" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1"/>
-    <text x="440" y="159" text-anchor="middle" fill="#f87171" font-size="9">Deleted</text>
+    <text x="370" y="148" text-anchor="middle" fill="#c76a6a" font-size="7.5">Remove</text>
+    <rect x="400" y="140" width="80" height="30" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1"/>
+    <text x="440" y="159" text-anchor="middle" fill="#c76a6a" font-size="9">Deleted</text>
     <line x1="480" y1="155" x2="520" y2="155" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arr-sum)"/>
     <text x="500" y="148" text-anchor="middle" fill="#86efac" font-size="7.5">Save</text>
     <rect x="524" y="140" width="90" height="30" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>
@@ -3954,13 +4069,13 @@ Console.WriteLine(orders[0].Customer == orders[1].Customer);  // TRUE ✅
 <text x="178" y="148" text-anchor="middle" fill="#7dd3fc" font-size="9">Materialize</text>
 <text x="20" y="168" fill="#64748b" font-size="8">Bellekte 3 ayri nesne:</text>
 <rect x="20" y="176" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
-<text x="90" y="194" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer A</text>
+<text x="90" y="194" text-anchor="middle" fill="#c4a44e" font-size="8" font-weight="bold">Customer A</text>
 <text x="90" y="208" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x1A2B)</text>
 <rect x="20" y="224" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
-<text x="90" y="242" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer B</text>
+<text x="90" y="242" text-anchor="middle" fill="#c4a44e" font-size="8" font-weight="bold">Customer B</text>
 <text x="90" y="256" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x3C4D)</text>
 <rect x="20" y="272" width="140" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.2"/>
-<text x="90" y="290" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="bold">Customer C</text>
+<text x="90" y="290" text-anchor="middle" fill="#c4a44e" font-size="8" font-weight="bold">Customer C</text>
 <text x="90" y="304" text-anchor="middle" fill="#94a3b8" font-size="7">Id=5 Ali (0x5E6F)</text>
 <rect x="200" y="182" width="80" height="24" rx="4" fill="#334155" stroke="#64748b"/>
 <text x="240" y="198" text-anchor="middle" fill="#e2e8f0" font-size="8">Order 1</text>
@@ -4010,11 +4125,7 @@ Console.WriteLine(orders[0].Customer == orders[1].Customer);  // TRUE ✅
 | Veriyi güncelleyeceksin | Hiçbiri (normal tracking) | SaveChanges çalışsın |
 | Raporlama / dashboard | \`AsNoTrackingWithIdentityResolution()\` | Büyük veri, tekrarlı join'ler |
 
-> 💡 **Performans sıralaması (hızdan yavaşa):**
->
-> \`AsNoTracking()\` > \`AsNoTrackingWithIdentityResolution()\` > Normal Tracking
->
-> Fark: Identity resolution, bir Dictionary\<PK, entity\> tutar — lookup maliyeti var ama tekrarlı entity'lerde bellek kazancı çok daha büyük.
+
 
 \`\`\`csharp
 // 🎯 Gerçek dünya örneği: 1000 siparişi 5 müşteriye ait
@@ -4083,11 +4194,7 @@ WHERE stock = 0;
 
 </details>
 
-> 💡 **Performans karşılaştırma:**
-> | Yöntem | 1000 kayıt güncelleme |
-> |--------|----------------------|
-> | Klasik (foreach + SaveChanges) | ~1000 UPDATE + tracking overhead |
-> | ExecuteUpdateAsync | 1 UPDATE sorgusu! |
+
 
 > ⚠️ **Change Tracking Limitleri:**
 >
@@ -4114,11 +4221,184 @@ WHERE stock = 0;
 >
 > EF Core parametre limitini aşınca otomatik batch'lere böler — crash olmaz ama çok sayıda roundtrip olabilir. \`MaxBatchSize\` ile kontrol et.
 
+**❌ / ✅ Change Tracking Sık Yapılan Hatalar:**
+
+\`\`\`csharp
+// ❌ YANLIŞ: Her kayıt için ayrı SaveChanges — N roundtrip
+foreach (var product in products)
+{
+    product.Price *= 1.1m;
+    await context.SaveChangesAsync(); // 💀 1000 ürün = 1000 roundtrip!
+}
+
+// ✅ DOĞRU: Tüm değişiklikleri yap, sonra tek SaveChanges
+foreach (var product in products)
+    product.Price *= 1.1m;
+await context.SaveChangesAsync(); // ✅ 1 batch (veya birkaç batch)
+
+// ✅✅ EN İYİ: ExecuteUpdate — entity yükleme bile yok
+await context.Products.ExecuteUpdateAsync(
+    s => s.SetProperty(p => p.Price, p => p.Price * 1.1m)); // ✅ Tek UPDATE SQL
+\`\`\`
+
+\`\`\`csharp
+// ❌ YANLIŞ: Background service'de context'i tekrar tekrar kullanma
+public class ImportService : BackgroundService
+{
+    private readonly AppDbContext _context; // ❌ Singleton context = bellek leak!
+
+    protected override async Task ExecuteAsync(...)
+    {
+        foreach (var batch in GetBatches())
+        {
+            _context.AddRange(batch); // Tracker sonsuz büyür!
+            await _context.SaveChangesAsync();
+        }
+    }
+}
+
+// ✅ DOĞRU: Her batch için yeni scope/context
+public class ImportService : BackgroundService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    protected override async Task ExecuteAsync(...)
+    {
+        foreach (var batch in GetBatches())
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            context.AddRange(batch);
+            await context.SaveChangesAsync();
+        } // Her iterasyonda context dispose → bellek temiz
+    }
+}
+\`\`\`
+
 ---
 
 ## 12. LINQ → SQL Çeviri Rehberi 🟡
 
-> EF Core, LINQ ifadelerini SQL'e çevirir. Her operatörün nasıl SQL'e dönüştüğünü bilmek, doğru sorgu yazmanın temelidir.
+EF Core, LINQ ifadelerini SQL'e çevirir. Her operatörün nasıl SQL'e dönüştüğünü bilmek, performanslı ve doğru sorgu yazmanın temelidir. Bu bölüm her LINQ metodu için karşılık gelen SQL'i gösterir — kopyala-yapıştır referansı.
+
+---
+
+### � LINQ → SQL: Ne Zaman SQL'ü Tetiklersin?
+
+<!-- LINQ → SQL Pipeline Animation -->
+<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <!-- Stage 1: LINQ Expression -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
+    <rect x="10" y="20" width="120" height="55" rx="6" fill="#1e293b" stroke="#7c9cbf" stroke-width="1.5"/>
+    <text x="70" y="42" text-anchor="middle" fill="#7c9cbf" font-size="8.5" font-weight="600">1. C# LINQ</text>
+    <text x="70" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">.Where().Select()</text>
+    <text x="70" y="68" text-anchor="middle" fill="#94a3b8" font-size="7">.Join().OrderBy()</text>
+  </g>
+  <!-- Arrow 1→2 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.3s" fill="freeze"/>
+    <line x1="130" y1="47" x2="155" y2="47" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="155,43 163,47 155,51" fill="#475569"/>
+  </g>
+  <!-- Stage 2: Expression Tree -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.8s" dur="0.4s" fill="freeze"/>
+    <rect x="165" y="20" width="120" height="55" rx="6" fill="#1e293b" stroke="#9b8abf" stroke-width="1.5"/>
+    <text x="225" y="42" text-anchor="middle" fill="#9b8abf" font-size="8.5" font-weight="600">2. Expression Tree</text>
+    <text x="225" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">Sorgu ağaç yapısında</text>
+    <text x="225" y="68" text-anchor="middle" fill="#94a3b8" font-size="7">hafızada tutulur</text>
+  </g>
+  <!-- Arrow 2→3 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.3s" fill="freeze"/>
+    <line x1="285" y1="47" x2="310" y2="47" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="310,43 318,47 310,51" fill="#475569"/>
+  </g>
+  <!-- Stage 3: Query Model -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.4s" dur="0.4s" fill="freeze"/>
+    <rect x="320" y="20" width="120" height="55" rx="6" fill="#1e293b" stroke="#c4a44e" stroke-width="1.5"/>
+    <text x="380" y="42" text-anchor="middle" fill="#c4a44e" font-size="8.5" font-weight="600">3. SQL Modeli</text>
+    <text x="380" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">Hangi tablo, hangi</text>
+    <text x="380" y="68" text-anchor="middle" fill="#94a3b8" font-size="7">sütun, hangi koşul?</text>
+  </g>
+  <!-- Arrow 3→4 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.3s" fill="freeze"/>
+    <line x1="440" y1="47" x2="465" y2="47" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="465,43 473,47 465,51" fill="#475569"/>
+  </g>
+  <!-- Stage 4: SQL Generation -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.0s" dur="0.4s" fill="freeze"/>
+    <rect x="475" y="20" width="120" height="55" rx="6" fill="#1e293b" stroke="#6b9e7a" stroke-width="1.5"/>
+    <text x="535" y="42" text-anchor="middle" fill="#6b9e7a" font-size="8.5" font-weight="600">4. SQL Yazımı</text>
+    <text x="535" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">SQL Server/PG'ye</text>
+    <text x="535" y="68" text-anchor="middle" fill="#94a3b8" font-size="7">özel SQL üretir</text>
+  </g>
+  <!-- Arrow 4→5 -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.4s" dur="0.3s" fill="freeze"/>
+    <line x1="595" y1="47" x2="620" y2="47" stroke="#475569" stroke-width="1.2"/>
+    <polygon points="620,43 628,47 620,51" fill="#475569"/>
+  </g>
+  <!-- Stage 5: Execute -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="2.6s" dur="0.4s" fill="freeze"/>
+    <rect x="630" y="20" width="40" height="55" rx="6" fill="#1e293b" stroke="#c76a6a" stroke-width="1.5"/>
+    <text x="650" y="42" text-anchor="middle" fill="#c76a6a" font-size="8" font-weight="600">5.</text>
+    <text x="650" y="55" text-anchor="middle" fill="#c76a6a" font-size="7">DB</text>
+    <text x="650" y="67" text-anchor="middle" fill="#94a3b8" font-size="6.5">ADO.NET</text>
+  </g>
+
+  <!-- Detailed explanation boxes below -->
+  <!-- Box 1: IQueryable -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="3.2s" dur="0.5s" fill="freeze"/>
+    <rect x="10" y="100" width="210" height="90" rx="5" fill="#1e293b" stroke="#475569" stroke-width="0.8"/>
+    <text x="20" y="118" fill="#7c9cbf" font-size="8" font-weight="600">IQueryable = Sorgu ÇALIŞMAZ</text>
+    <text x="20" y="134" fill="#e2e8f0" font-size="7.5">.Where(p => p.Price > 100)</text>
+    <text x="20" y="148" fill="#e2e8f0" font-size="7.5">.OrderBy(p => p.Name)</text>
+    <text x="20" y="162" fill="#94a3b8" font-size="7">↑ Henüz SQL yok! Sadece expression</text>
+    <text x="20" y="176" fill="#94a3b8" font-size="7">biriktiriliyor (deferred execution)</text>
+  </g>
+
+  <!-- Box 2: Materialization trigger -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="3.6s" dur="0.5s" fill="freeze"/>
+    <rect x="235" y="100" width="210" height="90" rx="5" fill="#1e293b" stroke="#475569" stroke-width="0.8"/>
+    <text x="245" y="118" fill="#c4a44e" font-size="8" font-weight="600">SQL'i Tetikleyen Metodlar</text>
+    <text x="245" y="134" fill="#e2e8f0" font-size="7.5">.ToList() / .ToArray()</text>
+    <text x="245" y="148" fill="#e2e8f0" font-size="7.5">.First() / .Single() / .Count()</text>
+    <text x="245" y="162" fill="#e2e8f0" font-size="7.5">await foreach (async stream)</text>
+    <text x="245" y="176" fill="#94a3b8" font-size="7">↑ Bu çağrılar SQL'i tetikler!</text>
+  </g>
+
+  <!-- Box 3: Client vs Server -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="4.0s" dur="0.5s" fill="freeze"/>
+    <rect x="460" y="100" width="210" height="90" rx="5" fill="#1e293b" stroke="#c76a6a" stroke-width="0.8"/>
+    <text x="470" y="118" fill="#c76a6a" font-size="8" font-weight="600">⚠️ Çevrilemezse ne olur?</text>
+    <text x="470" y="134" fill="#e2e8f0" font-size="7.5">EF Core 3+: Exception fırlatır</text>
+    <text x="470" y="148" fill="#e2e8f0" font-size="7.5">(client evaluation yasak)</text>
+    <text x="470" y="164" fill="#94a3b8" font-size="7">Çözüm: .AsEnumerable() ile</text>
+    <text x="470" y="178" fill="#94a3b8" font-size="7">bilinçli client'a çek</text>
+  </g>
+
+  <!-- Key insight box -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="4.5s" dur="0.5s" fill="freeze"/>
+    <rect x="10" y="210" width="660" height="95" rx="6" fill="rgba(107,138,253,0.06)" stroke="rgba(107,138,253,0.2)" stroke-width="1"/>
+    <text x="25" y="232" fill="#7c8fb8" font-size="8.5" font-weight="600">💡 Kritik Kavrayış: IQueryable vs IEnumerable</text>
+    <text x="25" y="250" fill="#e2e8f0" font-size="7.5">• IQueryable&lt;T&gt; → Expression tree tutar → DB'de çalışır → verimli (az veri transfer)</text>
+    <text x="25" y="266" fill="#e2e8f0" font-size="7.5">• IEnumerable&lt;T&gt; → Delegate tutar → bellekte çalışır → TÜM veriyi çeker sonra filtreler</text>
+    <text x="25" y="284" fill="#c76a6a" font-size="7.5">• ❌ repository.GetAll().Where(x => ...) → 1M satırı belleğe çekip filtreleme = felaket</text>
+    <text x="25" y="300" fill="#6b9e7a" font-size="7.5">• ✅ repository.Query().Where(x => ...).ToListAsync() → DB'de filtreleme = 50 satır döner</text>
+  </g>
+</svg>
+
+> 🔑 **Temel Kural:** \`.ToList()\`, \`.First()\`, \`.Count()\` gibi "materialization" metodlarını **mümkün olduğunca geç** çağır. Her \`.Where()\`, \`.Select()\`, \`.OrderBy()\` çağrısı sorguyu zenginleştirir ama DB'ye gitmez — ta ki materialization tetiklenene kadar.
 
 ---
 
@@ -4242,10 +4522,51 @@ HAVING COUNT(*) > 5;
 
 ---
 
-### Join (Manuel)
+### Inner Join
+
+<!-- INNER JOIN Venn Diagram Animation -->
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-inner">
+      <circle cx="190" cy="120" r="75"/>
+    </clipPath>
+  </defs>
+  <!-- Title -->
+  <text x="260" y="20" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="600">INNER JOIN</text>
+  <!-- Left Circle (Table A) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="75" fill="none" stroke="#7c9cbf" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="140" y="85" fill="#7c9cbf" font-size="11" font-weight="500">Products</text>
+  </g>
+  <!-- Right Circle (Table B) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="75" fill="none" stroke="#6b9e7a" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="320" y="85" fill="#6b9e7a" font-size="11" font-weight="500">Categories</text>
+  </g>
+  <!-- Intersection highlight (animated) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.6s" fill="freeze"/>
+    <path d="M245,57.5 A75,75 0 0,1 245,182.5 A75,75 0 0,1 245,57.5 Z" fill="none"/>
+    <circle cx="300" cy="120" r="75" clip-path="url(#clip-inner)" fill="rgba(251,191,36,0.25)" stroke="none"/>
+    <text x="245" y="125" text-anchor="middle" fill="#c4a44e" font-size="10" font-weight="600">Eşleşen</text>
+    <text x="245" y="140" text-anchor="middle" fill="#c4a44e" font-size="9">satırlar</text>
+  </g>
+  <!-- Description -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.4s" fill="freeze"/>
+    <text x="245" y="210" text-anchor="middle" fill="#94a3b8" font-size="9.5">Sadece iki tabloda da eşleşen kayıtlar döner</text>
+  </g>
+  <!-- Pulse animation on intersection -->
+  <circle cx="245" cy="120" r="20" fill="rgba(251,191,36,0.15)" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" begin="2.5s" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="15;30;15" begin="2.5s" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>
 
 \`\`\`csharp
-// Explicit Join — navigation property YOKSA kullanılır
+// Inner Join — navigation property YOKSA kullanılır
 var result = await context.Products
     .Join(context.Categories,
         product => product.CategoryId,
@@ -4280,8 +4601,90 @@ INNER JOIN categories AS c ON p.category_id = c.id;
 
 </details>
 
+> 💡 **Navigation property varsa Join yazma!** EF Core \`Include\` veya \`Select(p => p.Category.Name)\` ile otomatik JOIN üretir. Manuel \`Join()\` sadece navigation olmayan senaryolar için.
+
+**� Nasıl çalışır?**
+
+EF Core senin \`Join()\` çağrını alıp SQL'e çevirir:
+- 1. parametre (inner sequence) → hangi tabloyla join yapılacak
+- 2. parametre (outer key) → sol tablonun eşleşme sütunu → \`ON\` koşulunun sol tarafı
+- 3. parametre (inner key) → sağ tablonun eşleşme sütunu → \`ON\` koşulunun sağ tarafı
+- 4. parametre (result selector) → \`SELECT\` listesi
+
+> ⚠️ Birden fazla sütunla eşleşme yapacaksan anonymous type kullan: \`.Join(ctx.OrderItems, o => new { o.Id, o.Year }, oi => new { oi.OrderId, oi.Year }, ...)\`
+
+**📋 Ne Zaman Inner Join Kullanmalısın?**
+
+| Senaryo | Inner Join? | Daha İyi Alternatif |
+|---------|:-----------:|:-------------------:|
+| Navigation property var | ❌ | \`Include()\` veya \`Select(x => x.Nav.Prop)\` |
+| FK var ama navigation yok | ✅ | — |
+| Cross-database join | ✅ | Raw SQL da düşün |
+| Rapor sorgusu (flat DTO) | ✅ | Projection \`Select()\` + Join |
+| Sadece ilişkili kayıtlar lazım | ❌ | \`.Where(p => p.Category != null)\` |
+
+**❌ / ✅ Sık Yapılan Hata:**
+
 \`\`\`csharp
-// Left Join — DefaultIfEmpty pattern
+// ❌ YANLIŞ: Navigation property varken manuel Join
+var result = await context.Products
+    .Join(context.Categories,
+        p => p.CategoryId, c => c.Id,
+        (p, c) => new { p.Name, Category = c.Name })
+    .ToListAsync();
+
+// ✅ DOĞRU: Navigation property ile doğrudan erişim
+var result = await context.Products
+    .Select(p => new { p.Name, Category = p.Category.Name })
+    .ToListAsync();
+// İkisi de aynı SQL'i üretir — ama navigation versiyonu daha okunur ve refactor-safe
+\`\`\`
+
+---
+
+### Left Join
+
+<!-- LEFT JOIN Venn Diagram Animation -->
+<svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-leftjoin-a">
+      <circle cx="190" cy="105" r="70"/>
+    </clipPath>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">LEFT JOIN</text>
+  <!-- Left full circle highlighted -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.3s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="105" r="70" fill="rgba(96,165,250,0.22)" stroke="#7c9cbf" stroke-width="2"/>
+    <text x="145" y="75" fill="#7c9cbf" font-size="10" font-weight="500">Products</text>
+  </g>
+  <!-- Right circle (dashed) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.5s" fill="freeze"/>
+    <circle cx="295" cy="105" r="70" fill="none" stroke="#6b9e7a" stroke-width="1.8" stroke-dasharray="4 2"/>
+    <text x="320" y="75" fill="#6b9e7a" font-size="10" font-weight="500">Reviews</text>
+  </g>
+  <!-- Intersection -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="295" cy="105" r="70" clip-path="url(#clip-leftjoin-a)" fill="rgba(251,191,36,0.2)"/>
+    <text x="242" y="108" text-anchor="middle" fill="#c4a44e" font-size="9">Eşleşen</text>
+  </g>
+  <!-- Non-matching left area label -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.6s" dur="0.4s" fill="freeze"/>
+    <text x="150" y="108" text-anchor="middle" fill="#7c9cbf" font-size="8.5">NULL →</text>
+    <text x="260" y="192" text-anchor="middle" fill="#94a3b8" font-size="9">Sol tablonun tümü döner; eşleşmeyen sağ alanlar NULL</text>
+  </g>
+  <!-- Scan animation left to right -->
+  <rect x="120" y="35" width="2" height="140" rx="1" fill="#7c9cbf" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0.7;0" begin="2.2s" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="x" values="120;350;350;120" begin="2.2s" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+</svg>
+
+\`\`\`csharp
+// Left Join — EF Core 9 ve öncesi (GroupJoin + SelectMany + DefaultIfEmpty)
 var result = await context.Products
     .GroupJoin(context.Reviews,
         p => p.Id,
@@ -4292,6 +4695,19 @@ var result = await context.Products
         (x, review) => new
         {
             Product = x.product.Name,
+            Review = review != null ? review.Comment : "Yorum yok"
+        })
+    .ToListAsync();
+
+// ✅ EF Core 10+ — Aynı sorgu çok daha temiz:
+var result = await context.Products
+    .LeftJoin(
+        context.Reviews,
+        p => p.Id,
+        r => r.ProductId,
+        (product, review) => new
+        {
+            Product = product.Name,
             Review = review != null ? review.Comment : "Yorum yok"
         })
     .ToListAsync();
@@ -4321,29 +4737,98 @@ LEFT JOIN reviews AS r ON p.id = r.product_id;
 
 </details>
 
-> 💡 **Navigation property varsa Join yazma!** EF Core \`Include\` veya \`Select(p => p.Category.Name)\` ile otomatik JOIN üretir. Manuel \`Join()\` sadece navigation olmayan senaryolar için.
+**� EF Core'da Left Join nasıl yazılır?**
+
+EF Core 9 öncesinde Left Join yazmak karmaşıktı (\`GroupJoin + SelectMany + DefaultIfEmpty\`). EF Core 10 ile artık tek satırda yazabilirsin:
+
+\`\`\`csharp
+// EF Core 10 — temiz syntax
+var result = await context.Products
+    .LeftJoin(
+        context.Reviews,
+        p => p.Id,
+        r => r.ProductId,
+        (product, review) => new { product.Name, review.Comment })
+    .ToListAsync();
+\`\`\`
+
+> 🔑 Left Join'de sağ taraf \`null\` gelebilir! DTO'daki property'yi nullable yap veya \`COALESCE\` / \`??\` kullan.
+
+**📋 Ne Zaman Left Join Kullanmalısın?**
+
+| Senaryo | Left Join? | Açıklama |
+|---------|:----------:|:--------:|
+| "Tüm ürünler + varsa yorumu" | ✅ | Klasik left join senaryosu |
+| "Siparişi olmayan müşteriler" | ✅ | \`WHERE right_side IS NULL\` pattern |
+| "Her kullanıcı + son login" | ✅ | Left join + ROW_NUMBER veya lateral |
+| "Sadece eşleşen kayıtlar" | ❌ | Inner Join kullan |
+| Optional 1:1 relation (FK nullable) | ✅ | EF Core navigation ile otomatik |
+
+**❌ / ✅ Sık Yapılan Hata:**
+
+\`\`\`csharp
+// ❌ YANLIŞ: GroupJoin sonucu düzleştirmeden kullanma
+var wrong = await context.Products
+    .GroupJoin(context.Reviews, p => p.Id, r => r.ProductId, (p, reviews) => new { p, reviews })
+    .ToListAsync(); // N+1 riski! reviews her ürün için ayrı sorgu olabilir
+
+// ✅ DOĞRU: SelectMany + DefaultIfEmpty ile düzleştir (veya LeftJoin kullan)
+var correct = await context.Products
+    .GroupJoin(context.Reviews, p => p.Id, r => r.ProductId, (p, reviews) => new { p, reviews })
+    .SelectMany(x => x.reviews.DefaultIfEmpty(), (x, review) => new
+    {
+        Product = x.p.Name,
+        Review = review != null ? review.Comment : "Yorum yok"
+    })
+    .ToListAsync();
+\`\`\`
 
 ---
 
-### LeftJoin / RightJoin — EF Core 10+ 🆕
+### Right Join
+
+<!-- RIGHT JOIN Venn Diagram Animation -->
+<svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-rightjoin-b">
+      <circle cx="295" cy="105" r="70"/>
+    </clipPath>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">RIGHT JOIN</text>
+  <!-- Left circle (dashed) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.3s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="105" r="70" fill="none" stroke="#7c9cbf" stroke-width="1.8" stroke-dasharray="4 2"/>
+    <text x="145" y="75" fill="#7c9cbf" font-size="10" font-weight="500">OrderItems</text>
+  </g>
+  <!-- Right full circle highlighted -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.5s" fill="freeze"/>
+    <circle cx="295" cy="105" r="70" fill="rgba(74,222,128,0.22)" stroke="#6b9e7a" stroke-width="2"/>
+    <text x="320" y="75" fill="#6b9e7a" font-size="10" font-weight="500">Products</text>
+  </g>
+  <!-- Intersection -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="105" r="70" clip-path="url(#clip-rightjoin-b)" fill="rgba(251,191,36,0.2)"/>
+    <text x="242" y="108" text-anchor="middle" fill="#c4a44e" font-size="9">Eşleşen</text>
+  </g>
+  <!-- Non-matching right area label -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.6s" dur="0.4s" fill="freeze"/>
+    <text x="330" y="108" text-anchor="middle" fill="#6b9e7a" font-size="8.5">← NULL</text>
+    <text x="260" y="192" text-anchor="middle" fill="#94a3b8" font-size="9">Sağ tablonun tümü döner; eşleşmeyen sol alanlar NULL</text>
+  </g>
+  <!-- Scan animation right to left -->
+  <rect x="350" y="35" width="2" height="140" rx="1" fill="#6b9e7a" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0.7;0" begin="2.2s" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="x" values="350;120;120;350" begin="2.2s" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+</svg>
 
 \`\`\`csharp
-// EF Core 10: .NET 10 ile gelen LeftJoin operatörü — artık GroupJoin+SelectMany karmaşası YOK!
-var result = await context.Students
-    .LeftJoin(
-        context.Departments,
-        student => student.DepartmentId,
-        department => department.Id,
-        (student, department) => new
-        {
-            student.FirstName,
-            student.LastName,
-            Department = department.Name ?? "[Atanmamış]"
-        })
-    .ToListAsync();
-
-// RightJoin da aynı şekilde:
-var result2 = await context.OrderItems
+// RightJoin — EF Core 10+ 🆕
+var result = await context.OrderItems
     .RightJoin(
         context.Products,
         oi => oi.ProductId,
@@ -4360,13 +4845,6 @@ var result2 = await context.OrderItems
 <summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
--- LeftJoin çıktısı:
-SELECT [s].[FirstName], [s].[LastName],
-       COALESCE([d].[Name], N'[Atanmamış]') AS [Department]
-FROM [Students] AS [s]
-LEFT JOIN [Departments] AS [d] ON [s].[DepartmentId] = [d].[Id];
-
--- RightJoin çıktısı:
 SELECT [p].[Name], CASE WHEN [o].[Id] IS NOT NULL THEN 1 ELSE 0 END AS [Sold]
 FROM [OrderItems] AS [o]
 RIGHT JOIN [Products] AS [p] ON [o].[ProductId] = [p].[Id];
@@ -4378,13 +4856,6 @@ RIGHT JOIN [Products] AS [p] ON [o].[ProductId] = [p].[Id];
 <summary><b>🐘 PostgreSQL</b></summary>
 
 \`\`\`sql
--- LeftJoin çıktısı:
-SELECT s.first_name, s.last_name,
-       COALESCE(d.name, '[Atanmamış]') AS department
-FROM students AS s
-LEFT JOIN departments AS d ON s.department_id = d.id;
-
--- RightJoin çıktısı:
 SELECT p.name, CASE WHEN o.id IS NOT NULL THEN TRUE ELSE FALSE END AS sold
 FROM order_items AS o
 RIGHT JOIN products AS p ON o.product_id = p.id;
@@ -4392,8 +4863,152 @@ RIGHT JOIN products AS p ON o.product_id = p.id;
 
 </details>
 
-> 💡 **EF Core 9 ve öncesi** → \`GroupJoin + SelectMany + DefaultIfEmpty\` (yukarıdaki karmaşık pattern).  
+**🔬 Right Join Ne Zaman Gerekir?**
+
+Right Join, mantıksal olarak Left Join'in ayna görüntüsüdür. Çoğu senaryoda tabloların sırasını değiştirip Left Join kullanabilirsin. Ancak şu durumlarda Right Join tercih edilir:
+- Mevcut bir sorgu pipeline'ını bozmadan "diğer tarafı da dahil et" istediğinde
+- Raw SQL raporlarında okunabilirlik açısından "ana tablo sağda" daha doğal geldiğinde
+
+> ⚠️ **Uyarı:** Right Join, EF Core 9 öncesinde desteklenmiyordu. Eski projelerde Left Join + tablo sırası değişikliği kullan.
+
+**📋 Ne Zaman Right Join Kullanmalısın?**
+
+| Senaryo | Right Join? | Açıklama |
+|---------|:-----------:|:--------:|
+| "Hiç satılmamış ürünler dahil tüm ürünler" | ✅ | Products sağ tablo, sold=null olanlar |
+| "Tüm kategoriler + varsa ürün sayısı" | Bağlam | Left Join de aynı işi yapar |
+| "Pipeline'da tablo sırası değiştirilmemeli" | ✅ | Mevcut query yapısını koruma |
+| Genel kullanım | ❌ | Left Join daha yaygın ve okunur |
+
+---
+
+### Full Outer Join
+
+<!-- FULL OUTER JOIN Venn Diagram Animation -->
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-full-a">
+      <circle cx="190" cy="120" r="72"/>
+    </clipPath>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">FULL OUTER JOIN</text>
+  <!-- Left full circle -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="rgba(96,165,250,0.2)" stroke="#7c9cbf" stroke-width="2"/>
+    <text x="140" y="85" fill="#7c9cbf" font-size="10" font-weight="500">Students</text>
+  </g>
+  <!-- Right full circle -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" fill="rgba(74,222,128,0.2)" stroke="#6b9e7a" stroke-width="2"/>
+    <text x="330" y="85" fill="#6b9e7a" font-size="10" font-weight="500">Departments</text>
+  </g>
+  <!-- Intersection area -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" clip-path="url(#clip-full-a)" fill="rgba(251,191,36,0.2)"/>
+    <text x="245" y="118" text-anchor="middle" fill="#c4a44e" font-size="9" font-weight="500">Eşleşen</text>
+  </g>
+  <!-- NULL labels -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.6s" dur="0.4s" fill="freeze"/>
+    <text x="150" y="125" text-anchor="middle" fill="#7c9cbf" font-size="8">NULL →</text>
+    <text x="340" y="125" text-anchor="middle" fill="#6b9e7a" font-size="8">← NULL</text>
+    <text x="245" y="210" text-anchor="middle" fill="#94a3b8" font-size="9">Her iki tablonun tüm satırları döner; eşleşmeyenler NULL</text>
+  </g>
+  <!-- Dual sweep animation -->
+  <rect x="118" y="48" width="2" height="144" rx="1" fill="#7c9cbf" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0.6;0" begin="2.2s" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="x" values="118;370;370;118" begin="2.2s" dur="3s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="372" y="48" width="2" height="144" rx="1" fill="#6b9e7a" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0.6;0" begin="2.2s" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="x" values="372;118;118;372" begin="2.2s" dur="3s" repeatCount="indefinite"/>
+  </rect>
+</svg>
+
+> ⚠️ EF Core'da **native \`FullJoin()\` operatörü yoktur**. Aşağıdaki iki yoldan biriyle elde edilir:
+
+\`\`\`csharp
+// Yol 1: LeftJoin + RightJoin + Union (EF Core 10+)
+var left = context.Students
+    .LeftJoin(context.Departments,
+        s => s.DepartmentId, d => d.Id,
+        (s, d) => new { Student = s.Name, Department = (string?)d.Name });
+
+var right = context.Students
+    .RightJoin(context.Departments,
+        s => s.DepartmentId, d => d.Id,
+        (s, d) => new { Student = (string?)s.Name, Department = d.Name });
+
+var fullJoin = await left.Union(right).ToListAsync();
+\`\`\`
+
+\`\`\`csharp
+// Yol 2: Raw SQL
+var result = await context.Database
+    .SqlQueryRaw<StudentDeptDto>("""
+        SELECT s.Name AS Student, d.Name AS Department
+        FROM Students s
+        FULL OUTER JOIN Departments d ON s.DepartmentId = d.Id
+    """)
+    .ToListAsync();
+\`\`\`
+
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`sql
+-- Yol 1: UNION yaklaşımı
+SELECT [s].[Name] AS [Student], [d].[Name] AS [Department]
+FROM [Students] AS [s]
+LEFT JOIN [Departments] AS [d] ON [s].[DepartmentId] = [d].[Id]
+UNION
+SELECT [s].[Name] AS [Student], [d].[Name] AS [Department]
+FROM [Students] AS [s]
+RIGHT JOIN [Departments] AS [d] ON [s].[DepartmentId] = [d].[Id];
+
+-- Yol 2: Doğrudan FULL OUTER JOIN
+SELECT s.Name AS Student, d.Name AS Department
+FROM Students s
+FULL OUTER JOIN Departments d ON s.DepartmentId = d.Id;
+\`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Yol 1: UNION yaklaşımı
+SELECT s.name AS student, d.name AS department
+FROM students AS s
+LEFT JOIN departments AS d ON s.department_id = d.id
+UNION
+SELECT s.name AS student, d.name AS department
+FROM students AS s
+RIGHT JOIN departments AS d ON s.department_id = d.id;
+
+-- Yol 2: Doğrudan FULL OUTER JOIN
+SELECT s.name AS student, d.name AS department
+FROM students s
+FULL OUTER JOIN departments d ON s.department_id = d.id;
+\`\`\`
+
+</details>
+
+> 💡 **EF Core 9 ve öncesi** → \`GroupJoin + SelectMany + DefaultIfEmpty\` (LEFT JOIN) — Right Join için tabloları ters çevirmeniz gerekir.  
 > **EF Core 10+** → \`LeftJoin()\` / \`RightJoin()\` tek satır. C# query syntax (\`from...select\`) henüz desteklemiyor.
+
+**📋 Full Outer Join Ne Zaman Kullanmalısın?**
+
+| Senaryo | Full Outer Join? | Açıklama |
+|---------|:----------------:|:--------:|
+| "Hem öğrencisiz bölümler hem bölümsüz öğrenciler" | ✅ | Her iki tarafta eşleşmeyenler dahil |
+| İki bağımsız listeyi karşılaştırma (reconciliation) | ✅ | Stok ↔ Sipariş eşleştirme |
+| Raporlama: "tüm kombinasyonlar" | ✅ | Eksikleri bulmak için |
+| Normal uygulama CRUD'u | ❌ | Left veya Inner Join yeterli |
 
 ---
 
@@ -4472,20 +5087,209 @@ WHERE category_id = ANY(ARRAY[1, 3, 5]);
 
 ---
 
-### Distinct / Union / Except / Intersect
+### Distinct
+
+<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">DISTINCT</text>
+  <!-- Duplicate items -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
+    <rect x="30" y="40" width="180" height="105" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+    <text x="120" y="58" text-anchor="middle" fill="#94a3b8" font-size="9">Orijinal Sonuç</text>
+    <text x="45" y="78" fill="#7c9cbf" font-size="10">İstanbul</text>
+    <text x="45" y="96" fill="#7c9cbf" font-size="10">Ankara</text>
+    <text x="45" y="114" fill="#c76a6a" font-size="10" opacity="0.5">İstanbul</text>
+    <text x="45" y="132" fill="#c76a6a" font-size="10" opacity="0.5">Ankara</text>
+    <!-- Strikethrough on duplicates -->
+    <line x1="42" y1="114" x2="110" y2="114" stroke="#c76a6a" stroke-width="1" opacity="0">
+      <animate attributeName="opacity" from="0" to="0.8" begin="1s" dur="0.4s" fill="freeze"/>
+    </line>
+    <line x1="42" y1="132" x2="100" y2="132" stroke="#c76a6a" stroke-width="1" opacity="0">
+      <animate attributeName="opacity" from="0" to="0.8" begin="1.2s" dur="0.4s" fill="freeze"/>
+    </line>
+  </g>
+  <!-- Arrow -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.5s" dur="0.4s" fill="freeze"/>
+    <line x1="230" y1="90" x2="300" y2="90" stroke="#94a3b8" stroke-width="1.5"/>
+    <polygon points="300,85 312,90 300,95" fill="#94a3b8"/>
+    <text x="270" y="80" text-anchor="middle" fill="#c4a44e" font-size="9">DISTINCT</text>
+  </g>
+  <!-- Unique result -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.5s" fill="freeze"/>
+    <rect x="320" y="55" width="170" height="70" rx="6" fill="#1e293b" stroke="#6b9e7a" stroke-width="1.2"/>
+    <text x="405" y="73" text-anchor="middle" fill="#94a3b8" font-size="9">Tekrarsız Sonuç</text>
+    <text x="335" y="95" fill="#6b9e7a" font-size="10">İstanbul</text>
+    <text x="335" y="113" fill="#6b9e7a" font-size="10">Ankara</text>
+  </g>
+</svg>
 
 \`\`\`csharp
 var cities = await context.Customers
     .Select(c => c.City)
     .Distinct()
     .ToListAsync();
+\`\`\`
 
-// İki sorgunun birleşimi
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`sql
+SELECT DISTINCT [c].[City] FROM [Customers] AS [c];
+\`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT DISTINCT c.city FROM customers AS c;
+\`\`\`
+
+</details>
+
+---
+
+### Union / UnionAll
+
+<!-- UNION Animation -->
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">UNION</text>
+  <!-- Left Circle (Query A) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="rgba(96,165,250,0.2)" stroke="#7c9cbf" stroke-width="2"/>
+    <text x="150" y="90" fill="#7c9cbf" font-size="10" font-weight="500">Products</text>
+  </g>
+  <!-- Right Circle (Query B) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" fill="rgba(74,222,128,0.2)" stroke="#6b9e7a" stroke-width="2"/>
+    <text x="330" y="90" fill="#6b9e7a" font-size="10" font-weight="500">Categories</text>
+  </g>
+  <!-- Both filled = UNION -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="0.35" begin="1.2s" dur="0.6s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="#9b8abf"/>
+    <circle cx="300" cy="120" r="72" fill="#9b8abf"/>
+  </g>
+  <!-- Label -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.4s" fill="freeze"/>
+    <text x="245" y="125" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="600">A ∪ B</text>
+    <text x="245" y="210" text-anchor="middle" fill="#94a3b8" font-size="9">Her iki sorgunun sonuçları birleşir (tekrar eden satırlar elenir)</text>
+  </g>
+  <!-- Pulse -->
+  <circle cx="245" cy="120" r="20" fill="rgba(167,139,250,0.1)" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" begin="2.5s" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="20;65;20" begin="2.5s" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+
+\`\`\`csharp
+// Union — tekrar eden satırları eler (UNION)
 var allNames = await context.Products.Select(p => p.Name)
     .Union(context.Categories.Select(c => c.Name))
     .ToListAsync();
 
-// Fark (A'da olup B'de olmayan)
+// UnionAll — tekrarları korur (UNION ALL)
+var allWithDuplicates = await context.Products.Select(p => p.Name)
+    .Concat(context.Categories.Select(c => c.Name))    // Concat = UNION ALL
+    .ToListAsync();
+\`\`\`
+
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`sql
+-- Union (tekrarsız)
+SELECT [p].[Name] FROM [Products] AS [p]
+UNION
+SELECT [c].[Name] FROM [Categories] AS [c];
+
+-- Union All (tekrarlı)
+SELECT [p].[Name] FROM [Products] AS [p]
+UNION ALL
+SELECT [c].[Name] FROM [Categories] AS [c];
+\`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+-- Union (tekrarsız)
+SELECT p.name FROM products AS p
+UNION
+SELECT c.name FROM categories AS c;
+
+-- Union All (tekrarlı)
+SELECT p.name FROM products AS p
+UNION ALL
+SELECT c.name FROM categories AS c;
+\`\`\`
+
+</details>
+
+---
+
+### Except
+
+<!-- EXCEPT Animation -->
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-except-main-b">
+      <circle cx="300" cy="120" r="72"/>
+    </clipPath>
+    <mask id="mask-except-main">
+      <rect width="100%" height="100%" fill="white"/>
+      <circle cx="300" cy="120" r="72" fill="black"/>
+    </mask>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">EXCEPT</text>
+  <!-- Left circle (A - highlighted part = result) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="rgba(96,165,250,0.25)" stroke="#7c9cbf" stroke-width="2" mask="url(#mask-except-main)"/>
+    <text x="140" y="90" fill="#7c9cbf" font-size="10" font-weight="500">Products</text>
+  </g>
+  <!-- Left circle border (full) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="0.4" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="none" stroke="#7c9cbf" stroke-width="1" stroke-dasharray="4 2"/>
+  </g>
+  <!-- Right circle (B - excluded) -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" fill="none" stroke="#6b9e7a" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="330" y="90" fill="#6b9e7a" font-size="10" font-weight="500">Archived</text>
+  </g>
+  <!-- X mark on intersection -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" clip-path="url(#clip-except-main-b)" fill="rgba(248,113,113,0.15)"/>
+    <line x1="230" y1="100" x2="258" y2="140" stroke="#c76a6a" stroke-width="2" opacity="0.7"/>
+    <line x1="258" y1="100" x2="230" y2="140" stroke="#c76a6a" stroke-width="2" opacity="0.7"/>
+    <text x="244" y="160" text-anchor="middle" fill="#c76a6a" font-size="8">çıkar</text>
+  </g>
+  <!-- Labels -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.7s" dur="0.4s" fill="freeze"/>
+    <text x="150" y="125" text-anchor="middle" fill="#7c9cbf" font-size="9" font-weight="500">Sonuç</text>
+    <text x="245" y="210" text-anchor="middle" fill="#94a3b8" font-size="9">A'da olup B'de olmayan satırlar döner</text>
+  </g>
+  <!-- Blink -->
+  <circle cx="155" cy="120" r="15" fill="rgba(96,165,250,0.1)" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" begin="2.2s" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="12;30;12" begin="2.2s" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+
+\`\`\`csharp
+// Except — A'da olup B'de olmayan
 var onlyInProducts = await context.Products.Select(p => p.Name)
     .Except(context.ArchivedProducts.Select(a => a.Name))
     .ToListAsync();
@@ -4495,14 +5299,6 @@ var onlyInProducts = await context.Products.Select(p => p.Name)
 <summary><b>💾 SQL Server</b></summary>
 
 \`\`\`sql
-SELECT DISTINCT [c].[City] FROM [Customers] AS [c];
-
--- Union
-SELECT [p].[Name] FROM [Products] AS [p]
-UNION
-SELECT [c].[Name] FROM [Categories] AS [c];
-
--- Except
 SELECT [p].[Name] FROM [Products] AS [p]
 EXCEPT
 SELECT [a].[Name] FROM [ArchivedProducts] AS [a];
@@ -4514,20 +5310,121 @@ SELECT [a].[Name] FROM [ArchivedProducts] AS [a];
 <summary><b>🐘 PostgreSQL</b></summary>
 
 \`\`\`sql
-SELECT DISTINCT c.city FROM customers AS c;
-
--- Union
-SELECT p.name FROM products AS p
-UNION
-SELECT c.name FROM categories AS c;
-
--- Except
 SELECT p.name FROM products AS p
 EXCEPT
 SELECT a.name FROM archived_products AS a;
 \`\`\`
 
 </details>
+
+---
+
+### Intersect
+
+<!-- INTERSECT Animation -->
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <clipPath id="clip-intersect-main-a">
+      <circle cx="190" cy="120" r="72"/>
+    </clipPath>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">INTERSECT</text>
+  <!-- Left Circle -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.5s" fill="freeze"/>
+    <circle cx="190" cy="120" r="72" fill="none" stroke="#7c9cbf" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="140" y="90" fill="#7c9cbf" font-size="10" font-weight="500">Query A</text>
+  </g>
+  <!-- Right Circle -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.5s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" fill="none" stroke="#6b9e7a" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="330" y="90" fill="#6b9e7a" font-size="10" font-weight="500">Query B</text>
+  </g>
+  <!-- Intersection highlight -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.6s" fill="freeze"/>
+    <circle cx="300" cy="120" r="72" clip-path="url(#clip-intersect-main-a)" fill="rgba(251,191,36,0.3)" stroke="none"/>
+    <text x="245" y="118" text-anchor="middle" fill="#c4a44e" font-size="10" font-weight="600">A ∩ B</text>
+    <text x="245" y="133" text-anchor="middle" fill="#c4a44e" font-size="8">Ortak</text>
+  </g>
+  <!-- Label -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.4s" fill="freeze"/>
+    <text x="245" y="210" text-anchor="middle" fill="#94a3b8" font-size="9">Her iki sorguda da bulunan ortak satırlar döner</text>
+  </g>
+  <!-- Pulse -->
+  <circle cx="245" cy="120" r="15" fill="rgba(251,191,36,0.1)" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" begin="2.3s" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="12;30;12" begin="2.3s" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+
+\`\`\`csharp
+// Intersect — her iki sorguda da ortak olan satırlar
+var common = await context.Products.Select(p => p.Name)
+    .Intersect(context.FeaturedProducts.Select(f => f.Name))
+    .ToListAsync();
+\`\`\`
+
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`sql
+SELECT [p].[Name] FROM [Products] AS [p]
+INTERSECT
+SELECT [f].[Name] FROM [FeaturedProducts] AS [f];
+\`\`\`
+
+</details>
+
+<details>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`sql
+SELECT p.name FROM products AS p
+INTERSECT
+SELECT f.name FROM featured_products AS f;
+\`\`\`
+
+</details>
+
+**📋 Set Operasyonları: Ne Zaman Hangisini Kullan?**
+
+| İhtiyaç | Operatör | EF Core Metodu | Dikkat |
+|---------|:--------:|:--------------:|:------:|
+| İki sorguyu birleştir (tekrarsız) | UNION | \`.Union()\` | Sort + distinct → pahalı |
+| İki sorguyu birleştir (tekrarlı) | UNION ALL | \`.Concat()\` | En hızlı birleştirme |
+| A'da olup B'de olmayan | EXCEPT | \`.Except()\` | NOT IN'den daha verimli |
+| Her ikisinde de olan | INTERSECT | \`.Intersect()\` | AND + subquery ile aynı sonuç |
+| Tekrarlı satırları kaldır | DISTINCT | \`.Distinct()\` | Tüm sütunlar karşılaştırılır |
+
+**❌ / ✅ Set Operasyonlarında Sık Hatalar:**
+
+\`\`\`csharp
+// ❌ YANLIŞ: Farklı kolon sayısı/tipiyle Union (compile error)
+var wrong = context.Products.Select(p => new { p.Name, p.Price })
+    .Union(context.Categories.Select(c => new { c.Name })); // 💥 kolon uyumsuz!
+
+// ✅ DOĞRU: Aynı shape (aynı tip ve sayıda property)
+var correct = context.Products.Select(p => new { p.Name })
+    .Union(context.Categories.Select(c => new { c.Name }))
+    .ToListAsync();
+\`\`\`
+
+\`\`\`csharp
+// ❌ YANLIŞ: "Arşivlenmiş ürünleri çıkar" — client-side filter ile
+var products = await context.Products.ToListAsync();
+var archived = await context.ArchivedProducts.Select(a => a.Name).ToListAsync();
+var result = products.Where(p => !archived.Contains(p.Name)).ToList(); // 💀 Tüm veri bellekte
+
+// ✅ DOĞRU: EXCEPT ile DB'de çöz
+var result = await context.Products.Select(p => p.Name)
+    .Except(context.ArchivedProducts.Select(a => a.Name))
+    .ToListAsync(); // ✅ Tek SQL, DB'de çözülür
+\`\`\`
+
+> 🔑 **Performans İpucu:** \`Union()\` implicit DISTINCT yapar. Tekrar umurunda değilse \`Concat()\` (UNION ALL) kullan — sort maliyetinden kurtulursun.
 
 ---
 
@@ -4754,8 +5651,7 @@ var result = context.Products
 
 ## 13. Projection & DTO Mapping 🟡
 
-> **Projection**, veritabanından sadece ihtiyacın olan sütunları çekme sanatıdır.  
-> \`Include()\` yerine \`Select()\` kullanmak çoğu zaman daha performanslıdır.
+Veritabanından sadece ihtiyacın olan sütunları çeker — tüm entity'yi yüklemek yerine. \`Include()\` tüm sütunları getirir, \`Select()\` sadece belirttiklerini. Özellikle liste sayfaları ve API response'larında gereksiz veri transferini önler.
 
 ---
 
@@ -4936,14 +5832,11 @@ LEFT JOIN categories AS c ON p.category_id = c.id;
 | Admin panel (CRUD) | **Include** | Entity'yi komple ihtiyacın var |
 | Performans kritik (liste sorguları) | **Projection** | Network + bellek tasarrufu |
 
-> 💡 **Projection'da tracking kapalıdır** — dönen DTO bir entity olmadığı için EF izlemez. Bu performans avantajıdır.
-
 # 🟠 İLERİ SEVİYE
 
 ## 14. Owned Entities (Sahipli Varlıklar) 🟠
 
-> Aynı tabloda saklanan, bağımsız kimliği olmayan alt nesneler.  
-> **Ne zaman kullan:** Bir nesne tek başına anlam taşımıyorsa, her zaman sahibiyle birlikte sorgulanıyorsa ve kendi Id'si olmasını istemiyorsan.
+Bağımsız kimliği olmayan, her zaman sahibiyle birlikte var olan alt nesneleri aynı tabloda saklar. Adres, koordinat, para birimi gibi yapılar için — ayrı tablo + FK gerektirmez. Sahip silinince owned entity de otomatik gider.
 
 ---
 
@@ -4961,7 +5854,7 @@ Müşterinin iki adresi var. Adresin kendi kimliği yok, müşteri silinince adr
     <rect x="20" y="10" width="400" height="300" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="10" width="400" height="30" rx="4" fill="#334155"/>
     <text x="220" y="30" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Customers</text>
-    <text x="30" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="380" y="55" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="380" y="55" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="75" fill="#7dd3fc" font-size="10.5">nvarchar FullName</text>
     <text x="30" y="95" fill="#7dd3fc" font-size="10.5">nvarchar Email</text>
   </g>
@@ -4969,7 +5862,7 @@ Müşterinin iki adresi var. Adresin kendi kimliği yok, müşteri silinince adr
   <!-- Shipping group -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.4s" fill="freeze"/>
-    <rect x="35" y="108" width="375" height="80" rx="3" fill="rgba(107,138,253,0.06)" stroke="#6b8afd" stroke-width="0.8" stroke-dasharray="3,2"/>
+    <rect x="35" y="108" width="375" height="80" rx="3" fill="rgba(107,138,253,0.06)" stroke="#7c8fb8" stroke-width="0.8" stroke-dasharray="3,2"/>
     <text x="45" y="123" fill="#a5b4fc" font-size="9">Owned: ShippingAddress</text>
     <text x="45" y="143" fill="#7dd3fc" font-size="10.5">nvarchar Ship_Street</text>
     <text x="45" y="161" fill="#7dd3fc" font-size="10.5">nvarchar Ship_City</text>
@@ -5096,8 +5989,6 @@ CREATE TABLE customers (
 | 1 | Ahmet Yılmaz | ahmet@mail.com | Bağdat Cad. No:42 | İstanbul | 34710 | Türkiye | Atatürk Blv. No:1 | Ankara | 06100 | Türkiye |
 | 2 | Elif Demir | elif@mail.com | Kordon Boyu 15 | İzmir | 35220 | Türkiye | Kordon Boyu 15 | İzmir | 35220 | Türkiye |
 
-> 💡 Elif'in teslimat ve fatura adresi aynı — müşteri ikisini de farklı girebilir.
-
 ---
 
 ### OwnsMany — Sipariş kalemleri
@@ -5114,17 +6005,17 @@ Bir siparişin satır kalemleri (line items) vardır. Kalem, sipariş dışında
     <rect x="20" y="40" width="170" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="40" width="170" height="30" rx="4" fill="#334155"/>
     <text x="105" y="60" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Orders</text>
-    <text x="30" y="85" fill="#7dd3fc" font-size="10.5">int Id</text><text x="155" y="85" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="85" fill="#7dd3fc" font-size="10.5">int Id</text><text x="155" y="85" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="105" fill="#7dd3fc" font-size="10.5">nvarchar Reference</text>
   </g>
 
   <!-- OrderLineItems Entity -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.4s" fill="freeze"/>
-    <rect x="290" y="15" width="210" height="160" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2" stroke-dasharray="4,2"/>
+    <rect x="290" y="15" width="210" height="160" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2" stroke-dasharray="4,2"/>
     <rect x="290" y="15" width="210" height="30" rx="4" fill="#2d3a5c"/>
     <text x="395" y="35" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="600">OrderLineItems</text>
-    <text x="300" y="60" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="60" fill="#fbbf24" font-size="9">PK</text>
+    <text x="300" y="60" fill="#7dd3fc" font-size="10.5">int Id</text><text x="460" y="60" fill="#c4a44e" font-size="9">PK</text>
     <text x="300" y="80" fill="#7dd3fc" font-size="10.5">int OrderId</text><text x="460" y="80" fill="#34d399" font-size="9">FK</text>
     <text x="300" y="100" fill="#7dd3fc" font-size="10.5">nvarchar ProductName</text>
     <text x="300" y="120" fill="#7dd3fc" font-size="10.5">int Quantity</text>
@@ -5273,8 +6164,7 @@ builder.OwnsMany(o => o.LineItems, item =>
 
 ## 15. Complex Types — EF Core 8+ 🟠
 
-> \`OwnsOne\`'ın modern alternatifi. Kimlik (Id) içermez, her zaman sahibiyle aynı tabloda kalır.  
-> **Ne zaman kullan:** Birden fazla yerde kullanılan veri gruplarını tek tip olarak modellemek istiyorsan (para birimi, koordinat, renk vb.)
+Owned Entity'nin modern alternatifi. Kimliği (Id) olmayan, birden fazla entity'de tekrar kullanabileceğin değer nesneleri tanımlar. Para birimi, koordinat, renk gibi yapılar için. Owned Entity'den farkı: aynı tip birden fazla yerde kullanılabilir, tablo başına değil tip başına tanımlanır.
 
 ---
 
@@ -5425,7 +6315,7 @@ WHERE p.price_amount > 10000.0 AND p.price_currency = 'TRY';
 | Optional olabilir mi? | ✅ | ✅ EF Core 10+ 🆕 |
 | ExecuteUpdate desteği | ❌ | ✅ EF Core 10+ 🆕 |
 | Semantik | Kimliksiz entity gibi davranır | Gerçek value object |
-| Ne zaman tercih et | Legacy, koleksiyon / ayrı tablo gerekiyorsa | **Yeni projelerde her zaman tercih edin** (EF10 ile tam destek) |
+| Ne zaman tercih et | Legacy, koleksiyon / ayrı tablo gerekiyorsa | **Yeni projelerde her zaman tercih et** (EF10 ile tam destek) |
 
 > 🆕 **EF Core 10 ile Complex Types artık tavsiye edilen yaklaşım:**
 > - JSON mapping (\`b.ComplexProperty(c => c.Address, c => c.ToJson())\`)
@@ -5437,6 +6327,8 @@ WHERE p.price_amount > 10000.0 AND p.price_currency = 'TRY';
 ---
 
 ## 16. Kalıtım (Inheritance) — TPH / TPT / TPC 🟠
+
+Ortak bir base class'tan türeyen entity'leri veritabanında nasıl saklayacağını belirler. Üç strateji var: TPH (tek tablo, en hızlı), TPT (her tip ayrı tablo, normalize), TPC (her somut tip ayrı tablo, birleşik sorgu yok). Seçim performans ve veri bütünlüğü dengesine bağlı.
 
 ---
 
@@ -5454,7 +6346,7 @@ WHERE p.price_amount > 10000.0 AND p.price_currency = 'TRY';
     <rect x="20" y="10" width="420" height="290" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="10" width="420" height="30" rx="4" fill="#334155"/>
     <text x="230" y="30" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Payments</text>
-    <text x="30" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="395" y="55" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="395" y="55" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="75" fill="#7dd3fc" font-size="10.5">decimal Amount</text>
     <text x="30" y="95" fill="#7dd3fc" font-size="10.5">datetime2 PaidAt</text>
     <text x="30" y="115" fill="#7dd3fc" font-size="10.5">int OrderId</text><text x="395" y="115" fill="#34d399" font-size="9">FK</text>
@@ -5463,13 +6355,13 @@ WHERE p.price_amount > 10000.0 AND p.price_currency = 'TRY';
   <!-- Discriminator -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.3s" fill="freeze"/>
-    <text x="30" y="140" fill="#fbbf24" font-size="10.5">nvarchar PaymentType</text><text x="310" y="140" fill="#fb923c" font-size="9">Discriminator</text>
+    <text x="30" y="140" fill="#c4a44e" font-size="10.5">nvarchar PaymentType</text><text x="310" y="140" fill="#fb923c" font-size="9">Discriminator</text>
   </g>
 
   <!-- Credit card fields -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <rect x="35" y="152" width="395" height="40" rx="3" fill="rgba(107,138,253,0.05)" stroke="#6b8afd" stroke-width="0.6" stroke-dasharray="3,2"/>
+    <rect x="35" y="152" width="395" height="40" rx="3" fill="rgba(107,138,253,0.05)" stroke="#7c8fb8" stroke-width="0.6" stroke-dasharray="3,2"/>
     <text x="45" y="168" fill="#94a3b8" font-size="10">nvarchar Last4Digits</text><text x="280" y="168" fill="#64748b" font-size="8.5">nullable — credit_card</text>
     <text x="45" y="185" fill="#94a3b8" font-size="10">nvarchar CardHolder</text><text x="280" y="185" fill="#64748b" font-size="8.5">nullable — credit_card</text>
   </g>
@@ -5648,7 +6540,7 @@ WHERE p.payment_type = 'credit_card';
     <rect x="170" y="10" width="220" height="130" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="170" y="10" width="220" height="30" rx="4" fill="#334155"/>
     <text x="280" y="30" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Employees</text>
-    <text x="180" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="350" y="55" fill="#fbbf24" font-size="9">PK</text>
+    <text x="180" y="55" fill="#7dd3fc" font-size="10.5">int Id</text><text x="350" y="55" fill="#c4a44e" font-size="9">PK</text>
     <text x="180" y="75" fill="#7dd3fc" font-size="10.5">nvarchar FullName</text>
     <text x="180" y="95" fill="#7dd3fc" font-size="10.5">nvarchar Email</text>
     <text x="180" y="115" fill="#7dd3fc" font-size="10.5">decimal Salary</text>
@@ -5657,10 +6549,10 @@ WHERE p.payment_type = 'credit_card';
   <!-- Managers -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.4s" fill="freeze"/>
-    <rect x="20" y="190" width="200" height="105" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="20" y="190" width="200" height="105" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <rect x="20" y="190" width="200" height="30" rx="4" fill="#2d3a5c"/>
     <text x="120" y="210" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="600">Managers</text>
-    <text x="30" y="235" fill="#7dd3fc" font-size="10.5">int Id</text><text x="170" y="235" fill="#fbbf24" font-size="8">PK,FK</text>
+    <text x="30" y="235" fill="#7dd3fc" font-size="10.5">int Id</text><text x="170" y="235" fill="#c4a44e" font-size="8">PK,FK</text>
     <text x="30" y="255" fill="#7dd3fc" font-size="10.5">decimal Budget</text>
     <text x="30" y="275" fill="#7dd3fc" font-size="10.5">int TeamSize</text>
   </g>
@@ -5671,7 +6563,7 @@ WHERE p.payment_type = 'credit_card';
     <rect x="340" y="190" width="200" height="105" rx="4" fill="#1e293b" stroke="#34d399" stroke-width="1.2"/>
     <rect x="340" y="190" width="200" height="30" rx="4" fill="#1a3a2a"/>
     <text x="440" y="210" text-anchor="middle" fill="#86efac" font-size="11" font-weight="600">Developers</text>
-    <text x="350" y="235" fill="#7dd3fc" font-size="10.5">int Id</text><text x="490" y="235" fill="#fbbf24" font-size="8">PK,FK</text>
+    <text x="350" y="235" fill="#7dd3fc" font-size="10.5">int Id</text><text x="490" y="235" fill="#c4a44e" font-size="8">PK,FK</text>
     <text x="350" y="255" fill="#7dd3fc" font-size="10.5">nvarchar Speciality</text>
     <text x="350" y="275" fill="#7dd3fc" font-size="10.5">int SeniorityLevel</text>
   </g>
@@ -5827,8 +6719,6 @@ CREATE TABLE developers (
 | 1 | Backend | 3 |
 | 3 | Frontend | 1 |
 
-> 💡 Elif (Id=2) Manager tablosunda, Ahmet ve Mert Developers'da. Employees'da herkes var.
-
 ---
 
 ### TPC — Table Per Concrete Type
@@ -5842,10 +6732,10 @@ CREATE TABLE developers (
   <!-- EmailNotifications -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
-    <rect x="10" y="10" width="185" height="180" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="10" y="10" width="185" height="180" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <rect x="10" y="10" width="185" height="28" rx="4" fill="#2d3a5c"/>
     <text x="102" y="28" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="600">EmailNotifications</text>
-    <text x="20" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="155" y="50" fill="#fbbf24" font-size="8">PK Seq</text>
+    <text x="20" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="155" y="50" fill="#c4a44e" font-size="8">PK Seq</text>
     <text x="20" y="67" fill="#94a3b8" font-size="9.5">nvarchar UserId</text>
     <text x="20" y="84" fill="#94a3b8" font-size="9.5">nvarchar Message</text>
     <text x="20" y="101" fill="#94a3b8" font-size="9.5">datetime2 SentAt</text>
@@ -5861,7 +6751,7 @@ CREATE TABLE developers (
     <rect x="208" y="10" width="185" height="165" rx="4" fill="#1e293b" stroke="#34d399" stroke-width="1.2"/>
     <rect x="208" y="10" width="185" height="28" rx="4" fill="#1a3a2a"/>
     <text x="300" y="28" text-anchor="middle" fill="#86efac" font-size="10" font-weight="600">SmsNotifications</text>
-    <text x="218" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="353" y="50" fill="#fbbf24" font-size="8">PK Seq</text>
+    <text x="218" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="353" y="50" fill="#c4a44e" font-size="8">PK Seq</text>
     <text x="218" y="67" fill="#94a3b8" font-size="9.5">nvarchar UserId</text>
     <text x="218" y="84" fill="#94a3b8" font-size="9.5">nvarchar Message</text>
     <text x="218" y="101" fill="#94a3b8" font-size="9.5">datetime2 SentAt</text>
@@ -5875,8 +6765,8 @@ CREATE TABLE developers (
     <animate attributeName="opacity" from="0" to="1" begin="1.2s" dur="0.4s" fill="freeze"/>
     <rect x="406" y="10" width="185" height="180" rx="4" fill="#1e293b" stroke="#fb923c" stroke-width="1.2"/>
     <rect x="406" y="10" width="185" height="28" rx="4" fill="#3a2a1a"/>
-    <text x="498" y="28" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">PushNotifications</text>
-    <text x="416" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="551" y="50" fill="#fbbf24" font-size="8">PK Seq</text>
+    <text x="498" y="28" text-anchor="middle" fill="#c4a44e" font-size="10" font-weight="600">PushNotifications</text>
+    <text x="416" y="50" fill="#7dd3fc" font-size="9.5">int Id</text><text x="551" y="50" fill="#c4a44e" font-size="8">PK Seq</text>
     <text x="416" y="67" fill="#94a3b8" font-size="9.5">nvarchar UserId</text>
     <text x="416" y="84" fill="#94a3b8" font-size="9.5">nvarchar Message</text>
     <text x="416" y="101" fill="#94a3b8" font-size="9.5">datetime2 SentAt</text>
@@ -6112,8 +7002,9 @@ CREATE TABLE notifications_push  PARTITION OF notifications FOR VALUES IN ('push
 
 ## 17. Value Converters 🟠
 
-> .NET tipi ↔︎ DB sütun tipi dönüşümü.  
-> C# tarafında zengin tip kullanılır, DB'de uygun formatta saklanır.
+C# tarafında zengin tipler (enum, DateOnly, custom class) kullanırken bunların veritabanında hangi formatta saklanacağını belirler. Örneğin enum'ı string olarak saklamak, ya da \`Money\` nesnesini decimal sütuna dönüştürmek. EF Core okuma/yazma sırasında otomatik çevirir.
+
+#### Kullanım
 
 \`\`\`csharp
 // Enum → string
@@ -6162,8 +7053,6 @@ public enum OrderStatus { Pending, Confirmed, Shipped, Delivered, Cancelled }
 | 1 | ORD-001 | 0 | "Pending" |
 | 2 | ORD-002 | 2 | "Shipped" |
 | 3 | ORD-003 | 4 | "Cancelled" |
-
-> 💡 String saklama okunabilirliği artırır ama daha fazla yer kaplar. Int saklama daha performanslıdır.
 
 ### Global Converter Convention — Tüm Enum'ları String Yap
 
@@ -6313,19 +7202,18 @@ INSERT INTO orders (status) VALUES ('invalid'); -- ERROR!
 
 </details>
 
-> 💡 **Enum karşılaştırma:**
-> | Yaklaşım | SQL Server | PostgreSQL | Avantaj |
-> |----------|-----------|-----------|---------|
-> | \`HasConversion<string>()\` | ✅ NVARCHAR | ✅ TEXT | Provider bağımsız |
-> | \`HasConversion<int>()\` | ✅ INT | ✅ INT | Performanslı |
-> | Native PG enum | ❌ | ✅ \`CREATE TYPE AS ENUM\` | Type-safe, küçük, hızlı |
+💡 **Enum karşılaştırma:**
+| Yaklaşım | SQL Server | PostgreSQL | Avantaj |
+|----------|-----------|-----------|---------|
+| \`HasConversion<string>()\` | ✅ NVARCHAR | ✅ TEXT | Provider bağımsız |
+| \`HasConversion<int>()\` | ✅ INT | ✅ INT | Performanslı |
+| Native PG enum | ❌ | ✅ \`CREATE TYPE AS ENUM\` | Type-safe, küçük, hızlı |
 
 ---
 
 ## 18. Shadow Properties 🟠
 
-> Entity class'ında tanımlanmayan, yalnızca EF modelinde var olan özellikler.  
-> Audit (izleme) alanları için idealdir.
+C# entity class'ında tanımlanmayan ama veritabanında var olan sütunlar. Entity'yi "kirletmeden" audit alanları (CreatedAt, ModifiedBy), FK'lar veya altyapısal sütunlar eklemek için kullanılır. EF model'de tanımlanır, \`EF.Property<T>()\` ile sorgulanır.
 
 <svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
 
@@ -6346,7 +7234,7 @@ INSERT INTO orders (status) VALUES ('invalid'); -- ERROR!
   <!-- Arrow 1→2 -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.7s" dur="0.3s" fill="freeze"/>
-    <line x1="170" y1="100" x2="210" y2="100" stroke="#6b8afd" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="170" y1="100" x2="210" y2="100" stroke="#7c8fb8" stroke-width="1.5" stroke-dasharray="4,2"/>
     <text x="190" y="88" text-anchor="middle" fill="#a5b4fc" font-size="8">EF Model</text>
     <text x="190" y="115" text-anchor="middle" fill="#a5b4fc" font-size="8">ekler</text>
   </g>
@@ -6354,19 +7242,19 @@ INSERT INTO orders (status) VALUES ('invalid'); -- ERROR!
   <!-- EF Core Model -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <rect x="215" y="20" width="170" height="180" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="215" y="20" width="170" height="180" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <rect x="215" y="20" width="170" height="28" rx="4" fill="#2d3a5c"/>
     <text x="300" y="38" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="600">EF Core Model</text>
     <text x="225" y="62" fill="#7dd3fc" font-size="9.5">int Id</text>
     <text x="225" y="80" fill="#7dd3fc" font-size="9.5">string Name</text>
     <text x="225" y="98" fill="#7dd3fc" font-size="9.5">decimal Price</text>
-    <line x1="220" y1="108" x2="380" y2="108" stroke="#6b8afd" stroke-width="0.5" stroke-dasharray="2,2"/>
+    <line x1="220" y1="108" x2="380" y2="108" stroke="#7c8fb8" stroke-width="0.5" stroke-dasharray="2,2"/>
     <rect x="220" y="114" width="160" height="50" rx="3" fill="rgba(107,138,253,0.08)" stroke="none"/>
-    <text x="225" y="132" fill="#fbbf24" font-size="9.5">DateTime CreatedAt</text>
+    <text x="225" y="132" fill="#c4a44e" font-size="9.5">DateTime CreatedAt</text>
     <text x="346" y="132" fill="#64748b" font-size="7.5">shadow</text>
-    <text x="225" y="150" fill="#fbbf24" font-size="9.5">string CreatedBy</text>
+    <text x="225" y="150" fill="#c4a44e" font-size="9.5">string CreatedBy</text>
     <text x="346" y="150" fill="#64748b" font-size="7.5">shadow</text>
-    <text x="225" y="177" fill="#fbbf24" font-size="9.5">DateTime? UpdatedAt</text>
+    <text x="225" y="177" fill="#c4a44e" font-size="9.5">DateTime? UpdatedAt</text>
     <text x="360" y="177" fill="#64748b" font-size="7.5">shadow</text>
   </g>
 
@@ -6533,7 +7421,9 @@ builder.HasIndex("TenantId", "CreatedAt");  // Composite
 
 ## 19. Global Query Filters 🟠
 
-> Model düzeyinde, tüm sorgulara otomatik eklenen WHERE koşulları.
+Model düzeyinde tanımlanan, o entity'ye yapılan tüm sorgulara otomatik eklenen WHERE koşulları. Soft delete (\`IsDeleted\`), multi-tenancy (\`TenantId\`) gibi her sorguda tekrar tekrar yazılması gereken filtreleri tek noktada tanımlarsın.
+
+#### Tanımlama
 
 \`\`\`csharp
 // Soft delete filtresi
@@ -6677,7 +7567,7 @@ SELECT * FROM products;  -- Hiçbir filter yok
 
 </details>
 
-> 💡 **Migration notu:** EF Core 9'dan 10'a geçerken mevcut \`HasQueryFilter\` çağrılarınız çalışmaya devam eder. İsimli filter'lar opsiyoneldir — yalnızca seçici disable ihtiyacı olunca kullanın.
+> 💡 **Migration notu:** EF Core 9'dan 10'a geçerken mevcut \`HasQueryFilter\` çağrıların çalışmaya devam eder. İsimli filter'lar opsiyonel — yalnızca seçici disable ihtiyacın olunca kullan.
 
 ### İlişkili Entity'lerde Filter Davranışı
 
@@ -6719,11 +7609,15 @@ WHERE c.is_deleted = FALSE;
 
 > ⚠️ **Required navigation + filter = silent data loss!**  
 > Eğer \`Product.CategoryId\` required ise ve Category soft-deleted ise → Product join'da kaybolur.  
-> Çözüm: İlişkiyi optional yapın veya \`IgnoreQueryFilters()\` kullanın.
+> Çözüm: İlişkiyi optional yap veya \`IgnoreQueryFilters()\` kullan.
 
 ---
 
 ## 20. Sequence & Default Values 🟠
+
+Sequence, veritabanı seviyesinde sıralı numara üreten bir nesne. Identity'den farkı: INSERT öncesinde numara alabilirsin (sipariş numarası gibi). Default value ise sütuna değer verilmezse otomatik atanacak değer.
+
+#### Sequence Tanımlama
 
 \`\`\`csharp
 // Sequence tanımlama
@@ -6797,8 +7691,6 @@ Insert 11: Id = 11
 ...
 \`\`\`
 
-> 💡 Hi-Lo, toplu insert'te her seferinde DB'ye Id sormak yerine bir blok alır — çok daha hızlı.
-
 ### Sequence & Default Values — Provider farkları
 
 <details>
@@ -6848,7 +7740,7 @@ builder.Property(p => p.Slug)
 
 ## 21. Concurrency Tokens 🟠
 
-> Aynı kaydı iki kişi aynı anda güncellemeye çalışırsa ne olur? Optimistic Concurrency ile veri kaybını önlüyoruz.
+Aynı kaydı iki kullanıcı aynı anda güncellemeye çalıştığında veri kaybını önleyen mekanizma. EF Core "optimistic concurrency" kullanır — kayıt okunduğundaki versiyonu saklar, UPDATE sırasında versiyon değişmişse hata fırlatır. Böylece "son yazan kazanır" yerine "çakışma tespit edilir, sen karar ver" mantığı çalışır.
 
 ### 21.1 Optimistic vs Pessimistic Concurrency
 
@@ -6860,8 +7752,6 @@ builder.Property(p => p.Slug)
 EF Core **optimistic concurrency** kullanır: Okuma sırasında kilit almaz, yazma anında "bu kayıt okunduğundan beri değişmiş mi?" kontrolü yapar.
 
 ### 21.2 RowVersion (Timestamp) Token
-
-Tüm satır bazında otomatik concurrency kontrolü:
 
 \`\`\`csharp
 public class Product
@@ -6929,8 +7819,6 @@ SELECT xmin, id, name, price FROM products;
 > PostgreSQL'de ise \`xmin\` system column aynı rolü üstlenir (gizlidir, CREATE TABLE'da görünmez).
 
 ### 21.3 Property-Level Concurrency Token
-
-Belirli bir property üzerinde kontrol (tüm satır yerine tek alan):
 
 \`\`\`csharp
 public class BankAccount
@@ -7043,8 +7931,6 @@ T4                                         Price=100→150, SaveChanges()
 
 ### 21.5 Conflict Resolution (Çakışma Çözümleme)
 
-Exception yakaladıktan sonra 3 farklı strateji:
-
 **📌 Strateji karşılaştırma:**
 
 | Strateji | Ne zaman? | Veri kaybı riski |
@@ -7075,7 +7961,7 @@ Exception yakaladıktan sonra 3 farklı strateji:
   <!-- User B -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
-    <rect x="10" y="90" width="100" height="50" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="10" y="90" width="100" height="50" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <text x="60" y="110" text-anchor="middle" fill="#a5b4fc" font-size="9">User B</text>
     <text x="60" y="125" text-anchor="middle" fill="#7dd3fc" font-size="8">Price=200</text>
   </g>
@@ -7098,24 +7984,24 @@ Exception yakaladıktan sonra 3 farklı strateji:
   <!-- Arrow B tries → Conflict -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.4s" dur="0.3s" fill="freeze"/>
-    <line x1="110" y1="115" x2="195" y2="115" stroke="#f87171" stroke-width="1.2" marker-end="url(#arr-cw)"/>
-    <text x="152" y="108" text-anchor="middle" fill="#f87171" font-size="7.5">Save ✗</text>
+    <line x1="110" y1="115" x2="195" y2="115" stroke="#c76a6a" stroke-width="1.2" marker-end="url(#arr-cw)"/>
+    <text x="152" y="108" text-anchor="middle" fill="#c76a6a" font-size="7.5">Save ✗</text>
   </g>
 
   <!-- Conflict box -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.7s" dur="0.4s" fill="freeze"/>
-    <rect x="200" y="95" width="130" height="40" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.2"/>
-    <text x="265" y="112" text-anchor="middle" fill="#f87171" font-size="8.5">Concurrency</text>
-    <text x="265" y="125" text-anchor="middle" fill="#f87171" font-size="8.5">Exception!</text>
+    <rect x="200" y="95" width="130" height="40" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.2"/>
+    <text x="265" y="112" text-anchor="middle" fill="#c76a6a" font-size="8.5">Concurrency</text>
+    <text x="265" y="125" text-anchor="middle" fill="#c76a6a" font-size="8.5">Exception!</text>
   </g>
 
   <!-- Resolution: Reload original, retry -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="2.2s" dur="0.4s" fill="freeze"/>
-    <line x1="330" y1="115" x2="395" y2="115" stroke="#fbbf24" stroke-width="1.2" marker-end="url(#arr-cw)"/>
-    <text x="362" y="108" text-anchor="middle" fill="#fbbf24" font-size="7.5">Retry</text>
-    <rect x="400" y="95" width="150" height="40" rx="4" fill="#1e293b" stroke="#fbbf24" stroke-width="1.2"/>
+    <line x1="330" y1="115" x2="395" y2="115" stroke="#c4a44e" stroke-width="1.2" marker-end="url(#arr-cw)"/>
+    <text x="362" y="108" text-anchor="middle" fill="#c4a44e" font-size="7.5">Retry</text>
+    <rect x="400" y="95" width="150" height="40" rx="4" fill="#1e293b" stroke="#c4a44e" stroke-width="1.2"/>
     <text x="475" y="112" text-anchor="middle" fill="#fde68a" font-size="8">OriginalValues = DB</text>
     <text x="475" y="125" text-anchor="middle" fill="#fde68a" font-size="8">→ Save (Price=200)</text>
   </g>
@@ -7192,12 +8078,12 @@ public async Task UpdateProductClientWins(int productId, decimal newPrice)
   <!-- User B conflict -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <rect x="10" y="90" width="100" height="50" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.2"/>
-    <text x="60" y="110" text-anchor="middle" fill="#f87171" font-size="9">User B</text>
+    <rect x="10" y="90" width="100" height="50" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.2"/>
+    <text x="60" y="110" text-anchor="middle" fill="#c76a6a" font-size="9">User B</text>
     <text x="60" y="125" text-anchor="middle" fill="#7dd3fc" font-size="8">Price=200 ✗</text>
-    <line x1="110" y1="115" x2="195" y2="115" stroke="#f87171" stroke-width="1.2" marker-end="url(#arr-dw)"/>
-    <rect x="200" y="95" width="130" height="40" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.2"/>
-    <text x="265" y="115" text-anchor="middle" fill="#f87171" font-size="8.5">Exception!</text>
+    <line x1="110" y1="115" x2="195" y2="115" stroke="#c76a6a" stroke-width="1.2" marker-end="url(#arr-dw)"/>
+    <rect x="200" y="95" width="130" height="40" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.2"/>
+    <text x="265" y="115" text-anchor="middle" fill="#c76a6a" font-size="8.5">Exception!</text>
   </g>
 
   <!-- Resolution: Reload -->
@@ -7265,7 +8151,7 @@ public async Task UpdateProductDatabaseWins(int productId, decimal newPrice)
   <!-- User B changes Price -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.4s" fill="freeze"/>
-    <rect x="10" y="85" width="130" height="55" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="10" y="85" width="130" height="55" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <text x="75" y="103" text-anchor="middle" fill="#a5b4fc" font-size="9">User B wants</text>
     <text x="75" y="120" text-anchor="middle" fill="#7dd3fc" font-size="8">Price=25000</text>
     <text x="75" y="133" text-anchor="middle" fill="#64748b" font-size="7.5">Name değişmedi</text>
@@ -7274,17 +8160,17 @@ public async Task UpdateProductDatabaseWins(int productId, decimal newPrice)
   <!-- Conflict -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.1s" dur="0.3s" fill="freeze"/>
-    <line x1="140" y1="110" x2="195" y2="110" stroke="#f87171" stroke-width="1.2" marker-end="url(#arr-mg)"/>
-    <rect x="200" y="85" width="100" height="50" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.2"/>
-    <text x="250" y="107" text-anchor="middle" fill="#f87171" font-size="8.5">Conflict!</text>
+    <line x1="140" y1="110" x2="195" y2="110" stroke="#c76a6a" stroke-width="1.2" marker-end="url(#arr-mg)"/>
+    <rect x="200" y="85" width="100" height="50" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.2"/>
+    <text x="250" y="107" text-anchor="middle" fill="#c76a6a" font-size="8.5">Conflict!</text>
     <text x="250" y="122" text-anchor="middle" fill="#64748b" font-size="7.5">v1 ≠ v2</text>
   </g>
 
   <!-- Merge logic -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.5s" dur="0.4s" fill="freeze"/>
-    <line x1="300" y1="110" x2="345" y2="110" stroke="#fbbf24" stroke-width="1.2" marker-end="url(#arr-mg)"/>
-    <rect x="350" y="70" width="140" height="80" rx="4" fill="#1e293b" stroke="#fbbf24" stroke-width="1.2"/>
+    <line x1="300" y1="110" x2="345" y2="110" stroke="#c4a44e" stroke-width="1.2" marker-end="url(#arr-mg)"/>
+    <rect x="350" y="70" width="140" height="80" rx="4" fill="#1e293b" stroke="#c4a44e" stroke-width="1.2"/>
     <text x="420" y="88" text-anchor="middle" fill="#fde68a" font-size="8.5" font-weight="600">Merge Logic</text>
     <text x="360" y="107" fill="#64748b" font-size="7.5">A değiştirdi? → A kalsın</text>
     <text x="360" y="122" fill="#64748b" font-size="7.5">B değiştirdi? → B kalsın</text>
@@ -7347,8 +8233,6 @@ public async Task UpdateProductMerge(int productId, decimal newPrice, string new
 
 ### 21.6 Retry Pattern (Tekrar Deneme)
 
-Gerçek dünyada retry + max attempt ile kullanılır:
-
 \`\`\`csharp
 public async Task<bool> UpdateWithRetry(int productId, decimal newPrice, int maxRetries = 3)
 {
@@ -7381,7 +8265,7 @@ public async Task<bool> UpdateWithRetry(int productId, decimal newPrice, int max
 
 ### 21.7 Disconnected Scenario (Web API)
 
-Web API'de entity okuma ve güncelleme farklı request'lerde olur — RowVersion client'tan geri gönderilmelidir:
+Web API'de okuma ve güncelleme farklı request'lerde gerçekleşir. RowVersion değerini client'a gönderip geri alman gerekir.
 
 \`\`\`csharp
 // DTO
@@ -7502,17 +8386,17 @@ public class OrderItem
 
 | Hata | Sonuç | Çözüm |
 |------|-------|-------|
-| RowVersion'ı \`[NotMapped]\` yapmak | Concurrency kontrolü çalışmaz | Property'yi map'leyin |
-| \`AsNoTracking()\` ile okuyup güncelleme | OriginalValues kaybolur | Tracked okuyun veya OriginalValue'yu manuel set edin |
-| RowVersion'ı DTO'da göndermemek | Disconnected'da kontrol çalışmaz | DTO'ya ekleyin, client geri göndersin |
-| \`try/catch\` olmadan SaveChanges | Uygulama çöker | Her zaman exception handle edin |
+| RowVersion'ı \`[NotMapped]\` yapmak | Concurrency kontrolü çalışmaz | Property'yi map'le |
+| \`AsNoTracking()\` ile okuyup güncelleme | OriginalValues kaybolur | Tracked oku veya OriginalValue'yu manuel set et |
+| RowVersion'ı DTO'da göndermemek | Disconnected'da kontrol çalışmaz | DTO'ya ekle, client geri göndersin |
+| \`try/catch\` olmadan SaveChanges | Uygulama çöker | Her zaman exception handle et |
 | Tek DbContext'te sonsuz retry | Stale entry'ler birikir | Her retry'da Detach veya yeni context |
 
 ---
 
 ## 22. Raw SQL & Transactions 🟠
 
-> Bazen EF'in LINQ çevrimi yetmez. Raw SQL ve transaction kontrolü gerekir.
+EF Core'un LINQ çevirisi her senaryoya yetmez — karmaşık sorgular, performans-kritik SQL'ler veya stored procedure çağrıları için raw SQL kullanırsın. Birden fazla işlemi atomik yapmak (ya hepsi ya hiçbiri) için transaction'a sararsın.
 
 ---
 
@@ -7676,7 +8560,7 @@ COMMIT;
 
 ## 23. Pagination Patterns 🟠
 
-> Her web uygulamasında karşılaşılacak bir konu. Yanlış yapılırsa milyonlarca satır belleğe çekilir.
+Liste sayfalarında veriyi parça parça getirmek için iki yaklaşım var: Offset (Skip/Take — basit, her yerde çalışır) ve Keyset/Cursor (performanslı, büyük veri setleri için). Yanlış yapılırsa milyonlarca satır belleğe çekilir veya derin sayfalarda sorgu yavaşlar.
 
 ### Offset-Based (Skip/Take)
 
@@ -7830,7 +8714,7 @@ LIMIT 20;
 
 ## 24. Query Tags & Debugging 🟠
 
-> **Query Tag:** Sorguya yorum ekleyerek, SQL Profiler/Log'larda hangi koddan geldiğini anlamak.
+Production'da yavaş sorgu gördüğünde hangi koddan geldiğini bulmak için \`TagWith()\` ile sorguya yorum eklersin. Ayrıca geliştirme sırasında \`ToQueryString()\` ile LINQ'un ürettiği SQL'i debug edebilirsin.
 
 ### .TagWith() Kullanımı
 
@@ -7922,7 +8806,7 @@ Console.WriteLine(sql);
 
 ## 25. Testing with EF Core 🟠
 
-> **3 yaklaşım:** InMemory (basit), SQLite In-Memory (orta), TestContainers (en gerçekçi).
+EF Core kullanan kodu test etmek için üç yaklaşım var: SQLite In-Memory (hızlı, çoğu senaryo için yeterli), TestContainers (gerçek DB, en güvenilir), ve InMemory provider (artık önerilmiyor). Hangisini ne zaman kullanacağını seçmek testin güvenilirliğini belirler.
 
 ### Yaklaşım 1: SQLite In-Memory (Önerilen Başlangıç)
 
@@ -8104,8 +8988,7 @@ public class ProductRepositoryTests : IAsyncLifetime
 
 ## 26. Bulk & Batch Operations 🟠
 
-> Tek tek \`SaveChanges()\` çağırmak 1000 kayıtta 1000 SQL üretir.  
-> Toplu işlemler = tek SQL = kat kat performans.
+Tek tek \`SaveChanges()\` çağırmak 1000 kayıtta 1000 ayrı SQL üretir. Toplu işlemler (ExecuteUpdate, ExecuteDelete, BulkExtensions) bunu tek veya birkaç SQL'e indirir. Büyük veri setlerinde performans farkı 10x-100x arasında.
 
 ---
 
@@ -8238,8 +9121,6 @@ await context.Products.ExecuteUpdateAsync(s =>
 // ❌ EF Core 9 ve öncesi: Aynı işi yapmak için Expression API gerekiyordu (20+ satır karmaşık kod)
 \`\`\`
 
-> 💡 **Neden önemli?** Admin panellerinde "sadece değişen alanları güncelle" pattern'ı artık doğal C# ile yazılabilir — Expression tree oluşturma zorunluluğu kalktı.
-
 ---
 
 ### Batch Size Ayarı
@@ -8251,8 +9132,6 @@ options.UseSqlServer(conn, o => o.MaxBatchSize(100));
 // PostgreSQL varsayılan: 40 (Npgsql)
 options.UseNpgsql(conn, o => o.MaxBatchSize(200));
 \`\`\`
-
-> 💡 \`MaxBatchSize\` ne yapar? EF Core \`SaveChanges\`'ta kaç komutu tek roundtrip'e sığdıracağını belirler. Büyük batch insert'lerde artırmak faydalı.
 
 ---
 
@@ -8345,8 +9224,7 @@ await writer.CompleteAsync();
 
 ## 27. Global Exception Handling & Retry 🟠
 
-> EF Core'da veritabanı hataları kaçınılmazdır: deadlock, timeout, constraint violation, connection drop.  
-> Bunları doğru yakalamak ve handle etmek production stabilitesi için şart.
+Veritabanı hataları kaçınılmaz: deadlock, timeout, constraint violation, connection drop. Bu hataları doğru yakalamak (hangi exception = hangi hata), kullanıcıya anlamlı mesaj vermek ve geçici hatalar için retry mekanizması kurmak production stabilitesi için şart.
 
 ---
 
@@ -8531,6 +9409,10 @@ DbUpdateException yakalandı
 ---
 
 ## 28. JSON Columns — EF Core 7+ 🔴
+
+İlişkili verileri ayrı tabloda tutmak yerine aynı satırda JSON sütunu olarak saklar. Ayrı tablo + JOIN gerektirmez. Adres, ayarlar, metadata gibi her zaman parent ile birlikte okunan veriler için ideal. EF Core 7+ ile LINQ sorguları JSON içine kadar iner.
+
+#### Yapılandırma
 
 \`\`\`csharp
 // Owned entity → JSON sütununa map
@@ -8862,7 +9744,9 @@ SET details = jsonb_set(details, '{Views}', ((details->>'Views')::int + 1)::text
 
 ## 29. Primitive Collections — EF Core 8+ 🔴
 
-> \`List<string>\`, \`int[]\` gibi basit tipler artık JSON sütununa otomatik map edilir.
+\`List<string>\`, \`int[]\`, \`List<DayOfWeek>\` gibi basit tip koleksiyonları artık ayrı tablo gerektirmeden JSON sütununa otomatik saklanır. Tags, roller, izin listeleri gibi basit diziler için ayrı ilişki tablosu açmak yerine bu özelliği kullan.
+
+#### Kullanım
 
 \`\`\`csharp
 public class Post
@@ -8957,8 +9841,6 @@ builder.Property(p => p.Tags)
 | JSON Column (\`ToJson()\`) | Kompleks nested nesne | ✅ Full LINQ | 🟡 Parse overhead |
 | Ayrı tablo (1-N ilişki) | Büyük veri, index gerekli | ✅ Full | ✅ En hızlı (index) |
 
-> 💡 Eğer koleksiyon üzerinden sık filtreleme/sıralama yapılıyorsa ve veri büyükse → ayrı tablo + index daha performanslı.
-
 <details>
 <summary><b>🐘 PostgreSQL Native Array Desteği</b></summary>
 
@@ -9022,8 +9904,7 @@ WHERE array_length(liked_by_user_ids, 1) > 5  -- Count karşılığı
 
 ## 30. Interceptors 🔴
 
-> **Interceptor**, EF Core'un veritabanı işlemlerine araya girme (intercept) mekanizmasıdır.  
-> Audit logging, soft delete otomasyonu, query manipulation — production'da en sık karşılaşılan pattern'lerden.
+EF Core'un veritabanı işlemlerine (SaveChanges, komut çalıştırma, bağlantı açma) araya girme mekanizması. Audit logging, soft delete otomasyonu, slow query loglama, query manipulation gibi cross-cutting concern'leri merkezi bir noktada çözer — her repository'ye kod yazmak yerine.
 
 ### Interceptor Türleri
 
@@ -9162,7 +10043,7 @@ builder.Services.AddSingleton<SlowQueryInterceptor>();
   <!-- Step 2: SavingChanges Interceptor -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.4s" fill="freeze"/>
-    <rect x="152" y="100" width="130" height="36" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.2"/>
+    <rect x="152" y="100" width="130" height="36" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.2"/>
     <text x="217" y="115" text-anchor="middle" fill="#a5b4fc" font-size="8">SavingChangesAsync</text>
     <text x="217" y="128" text-anchor="middle" fill="#a5b4fc" font-size="8">Interceptor</text>
   </g>
@@ -9175,7 +10056,7 @@ builder.Services.AddSingleton<SlowQueryInterceptor>();
   <!-- Diamond: Audit Fields? -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1s" dur="0.4s" fill="freeze"/>
-    <polygon points="340,118 370,95 400,118 370,141" fill="#1e293b" stroke="#fbbf24" stroke-width="1.2"/>
+    <polygon points="340,118 370,95 400,118 370,141" fill="#1e293b" stroke="#c4a44e" stroke-width="1.2"/>
     <text x="370" y="121" text-anchor="middle" fill="#fde68a" font-size="7.5">Audit?</text>
   </g>
 
@@ -9197,7 +10078,7 @@ builder.Services.AddSingleton<SlowQueryInterceptor>();
     <line x1="370" y1="190" x2="460" y2="190" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arr-int)"/>
     <text x="385" y="200" fill="#64748b" font-size="8">Modified</text>
     <rect x="464" y="173" width="130" height="34" rx="4" fill="#1e293b" stroke="#fb923c" stroke-width="1"/>
-    <text x="529" y="193" text-anchor="middle" fill="#fbbf24" font-size="8.5">UpdatedAt/By set</text>
+    <text x="529" y="193" text-anchor="middle" fill="#c4a44e" font-size="8.5">UpdatedAt/By set</text>
   </g>
 
   <!-- Merge arrows → SQL -->
@@ -9221,7 +10102,7 @@ builder.Services.AddSingleton<SlowQueryInterceptor>();
 
 ## 31. Temporal Tables — Zamansal Tablolar 🔴🔶
 
-> **Temporal Table**, SQL Server'ın built-in özelliğidir — her satırın **tüm geçmiş versiyonlarını** otomatik saklar.  
+SQL Server'ın built-in özelliği — her satırın tüm geçmiş versiyonlarını otomatik saklar. "Bu müşterinin adresi 3 ay önce neydi?" gibi sorulara cevap verir. EF Core 6+ ile LINQ'tan doğrudan zaman yolculuğu sorguları yapabilirsin.  
 > "Bu müşterinin adresi 3 ay önce neydi?" gibi sorulara doğrudan cevap verebilirsiniz.
 
 ### Yapılandırma
@@ -9395,9 +10276,7 @@ ORDER BY c.valid_from;
 | 42 | Ahmet Yılmaz | Beşiktaş, İstanbul | 2024-03-15 | 2024-06-20 |
 | 42 | Ahmet Yılmaz | Sarıyer, İstanbul | 2024-06-20 | 9999-12-31 |
 
-> 💡 \`PeriodEnd = 9999-12-31\` → Bu, **şu anki aktif** kayıttır.
-
-> 🐘 **PostgreSQL'de Temporal Tables:**
+>  **PostgreSQL'de Temporal Tables:**
 > - PostgreSQL'de SQL Server'ın \`SYSTEM_VERSIONING\` özelliği **yoktur**
 > - \`IsTemporal()\` API'si PostgreSQL'de **çalışmaz** — bu tamamen SQL Server'a özgü
 > - Alternatif çözümler:
@@ -9475,7 +10354,7 @@ ORDER BY valid_from;
 
 ## 32. Keyless Entities — View & SP Mapping 🔴
 
-> **Ne zaman kullanılır?** Primary key'i olmayan sonuç setleri: **View'lar**, **Stored Procedure** sonuçları, **Raw SQL DTO'ları**.
+Primary key'i olmayan sonuç setlerini (View'lar, Stored Procedure sonuçları, Raw SQL DTO'ları) EF Core modeline map eder. \`HasNoKey()\` ile tanımlanır, Change Tracking yapılmaz, salt okunurdur.
 
 ### View Mapping
 
@@ -9591,7 +10470,7 @@ var report = await context.Set<MonthlySalesReport>()
 
 ## 33. Connection Resiliency & DbContext Pooling 🔴
 
-> Bulut ortamlarında geçici ağ hataları kaçınılmazdır. Retry mekanizması yoksa uygulama ilk geçici hatada çöker.
+Bulut ortamlarında geçici ağ hataları kaçınılmaz. Retry mekanizması yoksa uygulama ilk geçici hatada çöker. Connection Resiliency otomatik yeniden deneme sağlar; DbContext Pooling ise context nesne oluşturma maliyetini azaltarak throughput artırır.
 
 ### Connection Resiliency (Bağlantı Dayanıklılığı)
 
@@ -9675,17 +10554,17 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
     poolSize: 1024);  // Varsayılan: 1024
 \`\`\`
 
-### Performans Karşılaştırma
+### Pooling Farkı
 
-| Yöntem | İlk Request | Sonraki Requestler | Bellek |
-|--------|-------------|--------------------|----|
-| \`AddDbContext\` | ~1ms | ~1ms (her seferinde new) | Her request yeni allocation |
-| \`AddDbContextPool\` | ~1ms | ~0.1ms (havuzdan alır) | Sabit havuz, GC yükü az |
+| Yöntem | Davranış | Bellek |
+|--------|----------|--------|
+| \`AddDbContext\` | Her request'te yeni instance oluşturur | Her seferinde allocation + GC baskısı |
+| \`AddDbContextPool\` | Havuzdan hazır instance alır, işi bitince geri koyar | Sabit havuz, GC yükü minimal |
 
-> ⚠️ **Pooling Kısıtlamaları:**
-> - Constructor'da DI kullanamazsınız (singleton gibi davranır)
-> - DbContext'te state tutmayın (her kullanımda sıfırlanır)
-> - \`OnConfiguring\` override etmeyin
+> ⚠️ **Pooling kısıtlamaları:**
+> - Constructor'da DI kullanamazsın (singleton gibi davranır)
+> - DbContext'te state tutma (her kullanımda sıfırlanır)
+> - \`OnConfiguring\` override etme
 
 <details>
 <summary><b>🐘 PostgreSQL Connection & PgBouncer</b></summary>
@@ -9733,8 +10612,7 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 
 ## 34. Table Splitting & Entity Splitting 🔴
 
-> **Table Splitting:** Tek tablo → birden fazla entity.  
-> **Entity Splitting:** Tek entity → birden fazla tablo.
+Tek tabloyu birden fazla entity olarak okumak (Table Splitting — büyük BLOB sütunlarını lazy load etmek için) veya tek entity'yi birden fazla tabloya yaymak (Entity Splitting — sık/nadir okunan alanları ayırmak için) imkanı verir.
 
 ### Table Splitting — Büyük Tabloları Parçala
 
@@ -9927,7 +10805,7 @@ CREATE TABLE customer_contacts (
     <rect x="20" y="30" width="170" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="20" y="30" width="170" height="30" rx="4" fill="#334155"/>
     <text x="105" y="50" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Customers</text>
-    <text x="30" y="75" fill="#7dd3fc" font-size="10.5">int Id</text><text x="150" y="75" fill="#fbbf24" font-size="9">PK</text>
+    <text x="30" y="75" fill="#7dd3fc" font-size="10.5">int Id</text><text x="150" y="75" fill="#c4a44e" font-size="9">PK</text>
     <text x="30" y="95" fill="#7dd3fc" font-size="10.5">string Name</text>
   </g>
 
@@ -9937,7 +10815,7 @@ CREATE TABLE customer_contacts (
     <rect x="310" y="15" width="190" height="140" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
     <rect x="310" y="15" width="190" height="30" rx="4" fill="#334155"/>
     <text x="405" y="35" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="600">CustomerContacts</text>
-    <text x="320" y="60" fill="#7dd3fc" font-size="10.5">int Id</text><text x="450" y="60" fill="#fbbf24" font-size="8">PK,FK</text>
+    <text x="320" y="60" fill="#7dd3fc" font-size="10.5">int Id</text><text x="450" y="60" fill="#c4a44e" font-size="8">PK,FK</text>
     <text x="320" y="80" fill="#7dd3fc" font-size="10.5">string Phone</text>
     <text x="320" y="100" fill="#7dd3fc" font-size="10.5">string Email</text>
     <text x="320" y="120" fill="#7dd3fc" font-size="10.5">string Address</text>
@@ -9965,29 +10843,29 @@ Uygulama ve EF Core tek tablo görür — PostgreSQL arka planda doğru partitio
 <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
     <marker id="arrowPruning" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="#fbbf24"/>
+      <path d="M0,0 L8,3 L0,6" fill="#c4a44e"/>
     </marker>
   </defs>
-  <rect x="20" y="10" width="640" height="120" rx="6" fill="none" stroke="#60a5fa" stroke-width="2"/>
-  <text x="340" y="30" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="bold">orders (mantıksal tablo)</text>
+  <rect x="20" y="10" width="640" height="120" rx="6" fill="none" stroke="#7c9cbf" stroke-width="2"/>
+  <text x="340" y="30" text-anchor="middle" fill="#7c9cbf" font-size="12" font-weight="bold">orders (mantıksal tablo)</text>
   <rect x="40" y="42" width="135" height="65" rx="4" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,2"/>
   <text x="107" y="68" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">orders_2024</text>
   <text x="107" y="88" text-anchor="middle" fill="#94a3b8" font-size="9">(2024 data)</text>
   <rect x="190" y="42" width="135" height="65" rx="4" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,2"/>
   <text x="257" y="68" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">orders_2025</text>
   <text x="257" y="88" text-anchor="middle" fill="#94a3b8" font-size="9">(2025 data)</text>
-  <rect x="340" y="42" width="135" height="65" rx="4" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="2.5"/>
-  <text x="407" y="68" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="bold">orders_2026</text>
-  <text x="407" y="88" text-anchor="middle" fill="#fbbf24" font-size="9">(2026 data)</text>
-  <rect x="340" y="42" width="135" height="65" rx="4" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.5">
+  <rect x="340" y="42" width="135" height="65" rx="4" fill="rgba(251,191,36,0.12)" stroke="#c4a44e" stroke-width="2.5"/>
+  <text x="407" y="68" text-anchor="middle" fill="#c4a44e" font-size="10" font-weight="bold">orders_2026</text>
+  <text x="407" y="88" text-anchor="middle" fill="#c4a44e" font-size="9">(2026 data)</text>
+  <rect x="340" y="42" width="135" height="65" rx="4" fill="none" stroke="#c4a44e" stroke-width="2.5" opacity="0.5">
     <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
   </rect>
   <rect x="490" y="42" width="150" height="65" rx="4" fill="rgba(148,163,184,0.05)" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,2"/>
   <text x="565" y="78" text-anchor="middle" fill="#64748b" font-size="12">...</text>
-  <text x="30" y="160" fill="#f87171" font-size="10">SELECT &#42; FROM orders WHERE order_date = </text>
-  <text x="330" y="160" fill="#fbbf24" font-size="10" font-weight="bold">&#39;2026-05-18&#39;</text>
+  <text x="30" y="160" fill="#c76a6a" font-size="10">SELECT &#42; FROM orders WHERE order_date = </text>
+  <text x="330" y="160" fill="#c4a44e" font-size="10" font-weight="bold">&#39;2026-05-18&#39;</text>
   <text x="420" y="160" fill="#e2e8f0" font-size="10">;</text>
-  <path d="M407 148 L407 112" stroke="#fbbf24" stroke-width="1.5" fill="none" stroke-dasharray="3,2" marker-end="url(#arrowPruning)"/>
+  <path d="M407 148 L407 112" stroke="#c4a44e" stroke-width="1.5" fill="none" stroke-dasharray="3,2" marker-end="url(#arrowPruning)"/>
   <text x="30" y="195" fill="#22c55e" font-size="10">&#8594; PG sadece orders_2026 partition tarar (Partition Pruning)</text>
 </svg>
 
@@ -10107,7 +10985,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
 ### Migration'da Partitioning (Raw SQL ile)
 
-EF Core migration'ları partitioned tablo oluşturamaz. Raw SQL migration kullanılmalı:
+EF Core migration'ları partitioned tablo oluşturamaz — raw SQL ile kendin yazarsın.
 
 \`\`\`csharp
 public partial class CreatePartitionedOrders : Migration
@@ -10431,8 +11309,7 @@ E-fatura partition stratejisi:
 
 ## 35. Soft Delete Pattern (Tam Implementasyon) 🔴
 
-> **Soft Delete:** Veriyi gerçekten silmek yerine \`IsDeleted = true\` yaparak gizleme.  
-> Global filter + Interceptor + Cascade logic ile **tam** implementasyon.
+Veriyi fiziksel olarak silmek yerine \`IsDeleted = true\` flag'i ile gizleme. Yasal saklama zorunlulukları, geri alma (undo) ihtiyacı ve veri kaybı riskini ortadan kaldırır. Global Filter + Interceptor + Cascade logic ile tam implementasyon.
 
 ### Temel Interface & Base Entity
 
@@ -10644,7 +11521,7 @@ builder.Property(p => p.IsDeleted)
 
 ## 36. EF.Functions — Provider-Specific Fonksiyonlar 🔴🔶
 
-> Provider'a özgü fonksiyonları LINQ içinde kullanmak için **EF.Functions** kullanılır.
+LINQ'ta doğrudan yazılamayan veritabanı-özel fonksiyonları (LIKE, DATEPART, Full-Text Search, Vector Search) kullanmak için \`EF.Functions\` namespace'ini kullanırsın. Provider'a göre farklı fonksiyonlar mevcuttur.
 > Aşağıda önce SQL Server, ardından PostgreSQL örnekleri verilmiştir.
 
 ### String Fonksiyonları
@@ -10878,7 +11755,7 @@ LIMIT 5;
 
 ## 37. Compiled Queries 🔴
 
-> Aynı sorgu şekli çok sık çalışıyorsa (yoğun bir API endpoint gibi), sorgu derlemesini **bir kere** yapıp cache'leyerek performans kazanılır.>
+Aynı LINQ sorgusu her çağrıda expression tree'den SQL'e yeniden derlenir. Yoğun endpoint'lerde (saniyede binlerce istek) bu derleme maliyeti birikir. Compiled Query, derlemeyi bir kere yapıp cache'ler — sonraki çağrılarda sadece parametre değişir.
 
 ### Temel Compiled Query
 
@@ -10937,12 +11814,13 @@ public class ProductService
 }
 \`\`\`
 
-### Performans Karşılaştırma
+### Ne Zaman Compiled Query Kullan?
 
-| Yöntem | İlk Çağrı | Sonraki Çağrılar | Ne zaman kullan |
-|--------|-----------|-------------------|-----------------|
-| Normal LINQ | ~1-5ms parse | ~1-5ms parse (her seferinde) | Genel kullanım |
-| Compiled Query | ~1-5ms parse | ~0ms (cache) | Hot path, yoğun endpoint |
+| Durum | Compiled Query? | Neden |
+|-------|:---:|--------|
+| Saniyede yüzlerce kez çalışan endpoint | ✅ | Expression tree her seferinde parse edilmez, doğrudan cache'ten çalışır |
+| Nadir çalışan rapor sorgusu | ❌ | Fark hissedilmez, kod karmaşıklaşır |
+| Dinamik filtre/sıralama gereken sayfa | ❌ | Dynamic where/orderby desteklenmez |
 
 > ⚠️ **Kısıtlamalar:**
 > - Dynamic where/orderby **kullanılamaz**
@@ -10953,7 +11831,7 @@ public class ProductService
 
 ## 38. Multi-Tenancy Patterns 🔴
 
-> **Multi-Tenancy:** Tek uygulama + tek/ayrı DB → birden fazla kiracı (müşteri/organizasyon).
+Tek uygulama ile birden fazla kiracıya (müşteri/organizasyon) hizmet vermek. Üç yaklaşım: aynı tabloda discriminator sütunu (basit), kiracı başına ayrı schema (orta), kiracı başına ayrı veritabanı (tam izolasyon). Güvenlik, performans ve maliyet dengesine göre seçilir.
 
 ### Pattern 1: Discriminator (Aynı Tablo — Global Filter)
 
@@ -11069,8 +11947,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 
 ## 39. Audit Trail Pattern (Tam Implementasyon) 🔴
 
-> **Audit Trail:** Kim, ne zaman, neyi değiştirdi? Compliance (KVKK, SOX, HIPAA) ve debug için kritik.  
-> Shadow Properties + Interceptor + SaveChanges override ile tam çözüm.
+Kim, ne zaman, hangi alanı, eski değerden yeni değere değiştirdi? KVKK, SOX, HIPAA uyumluluğu ve debug için kritik. SaveChanges override veya Interceptor ile her değişiklik otomatik loglanır — entity kodlarına dokunmadan.
 
 ---
 
@@ -11305,8 +12182,7 @@ CREATE INDEX ix_audit_logs_changes ON audit_logs USING gin (changes);
 
 ## 40. Veri Koruma — Encryption, Hashing & Masking 🔴
 
-> Production'da hassas veri saklama kaçınılmaz. EF Core'da bu üç farklı strateji ile yönetilir:  
-> **Encrypt** (şifrele/çöz), **Hash** (tek yönlü özetle), **Mask** (görünümü gizle).
+Production'da hassas veri (TC kimlik, kart no, şifre) saklama kaçınılmaz. Üç farklı strateji: Encrypt (şifrele/çöz — geri dönüşümlü), Hash (tek yönlü özetle — şifreler için), Mask (görünümü gizle — loglama/raporlama için). Her birinin kullanım yeri ve EF Core entegrasyonu farklı.
 
 ---
 
@@ -11428,7 +12304,7 @@ SELECT national_id FROM customers WHERE id = 1;
 
 #### 🔄 Update İşlemlerinde Ne Olur?
 
-Value Converter kullandığınızda **decrypt/re-encrypt işlemi tamamen otomatiktir** — EF Core bunu sizin yerinize yapar:
+Value Converter decrypt/re-encrypt işlemini otomatik halleder:
 
 \`\`\`csharp
 // Update senaryosu — geliştirici perspektifi:
@@ -11445,32 +12321,32 @@ await context.SaveChangesAsync();
 <svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;margin:1.5rem auto;display:block;font-family:'JetBrains Mono',monospace;">
   <defs>
     <marker id="arrowDown" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
-      <path d="M0,0 L8,0 L4,6" fill="#60a5fa"/>
+      <path d="M0,0 L8,0 L4,6" fill="#7c9cbf"/>
     </marker>
   </defs>
   <rect x="20" y="10" width="560" height="120" rx="6" fill="none" stroke="#22c55e" stroke-width="1.5"/>
   <text x="300" y="30" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="bold">READ</text>
   <text x="40" y="55" fill="#94a3b8" font-size="10">DB:</text>
-  <text x="65" y="55" fill="#f87171" font-size="10">&quot;FmK3x9...base64...&quot;</text>
-  <rect x="60" y="40" width="180" height="20" rx="3" fill="none" stroke="#f87171" stroke-width="0.5" opacity="0.4"/>
-  <text x="150" y="80" text-anchor="middle" fill="#60a5fa" font-size="10">&#8595; Value Converter (Decrypt)</text>
-  <path d="M150 62 L150 70" stroke="#60a5fa" stroke-width="1" marker-end="url(#arrowDown)"/>
+  <text x="65" y="55" fill="#c76a6a" font-size="10">&quot;FmK3x9...base64...&quot;</text>
+  <rect x="60" y="40" width="180" height="20" rx="3" fill="none" stroke="#c76a6a" stroke-width="0.5" opacity="0.4"/>
+  <text x="150" y="80" text-anchor="middle" fill="#7c9cbf" font-size="10">&#8595; Value Converter (Decrypt)</text>
+  <path d="M150 62 L150 70" stroke="#7c9cbf" stroke-width="1" marker-end="url(#arrowDown)"/>
   <text x="40" y="110" fill="#94a3b8" font-size="10">C#:</text>
   <text x="65" y="110" fill="#22c55e" font-size="10">&quot;12345678901&quot;</text>
   <rect x="60" y="95" width="130" height="20" rx="3" fill="none" stroke="#22c55e" stroke-width="0.5" opacity="0.4"/>
-  <rect x="20" y="150" width="560" height="150" rx="6" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
-  <text x="300" y="170" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="bold">UPDATE</text>
+  <rect x="20" y="150" width="560" height="150" rx="6" fill="none" stroke="#c4a44e" stroke-width="1.5"/>
+  <text x="300" y="170" text-anchor="middle" fill="#c4a44e" font-size="12" font-weight="bold">UPDATE</text>
   <text x="40" y="195" fill="#94a3b8" font-size="10">C#:</text>
   <text x="65" y="195" fill="#e2e8f0" font-size="10">customer.NationalId = </text>
   <text x="250" y="195" fill="#22c55e" font-size="10">&quot;98765432101&quot;</text>
-  <text x="150" y="222" text-anchor="middle" fill="#60a5fa" font-size="10">&#8595; Value Converter (Encrypt)</text>
+  <text x="150" y="222" text-anchor="middle" fill="#7c9cbf" font-size="10">&#8595; Value Converter (Encrypt)</text>
   <text x="40" y="250" fill="#94a3b8" font-size="10">SQL:</text>
-  <text x="70" y="250" fill="#f87171" font-size="10" font-weight="bold">UPDATE</text>
+  <text x="70" y="250" fill="#c76a6a" font-size="10" font-weight="bold">UPDATE</text>
   <text x="125" y="250" fill="#e2e8f0" font-size="10">Customers</text>
-  <text x="70" y="270" fill="#f87171" font-size="10" font-weight="bold">SET</text>
+  <text x="70" y="270" fill="#c76a6a" font-size="10" font-weight="bold">SET</text>
   <text x="100" y="270" fill="#e2e8f0" font-size="10">NationalId = </text>
-  <text x="205" y="270" fill="#fbbf24" font-size="10">&#39;Xk7mP...(yeni)&#39;</text>
-  <text x="70" y="290" fill="#f87171" font-size="10" font-weight="bold">WHERE</text>
+  <text x="205" y="270" fill="#c4a44e" font-size="10">&#39;Xk7mP...(yeni)&#39;</text>
+  <text x="70" y="290" fill="#c76a6a" font-size="10" font-weight="bold">WHERE</text>
   <text x="115" y="290" fill="#e2e8f0" font-size="10">Id = 1</text>
 </svg>
 
@@ -11595,7 +12471,7 @@ builder.HasIndex(u => u.Email).IsUnique();  // Login lookup için
 
 #### 🔄 Hash'lenmiş Veriyi Güncelleme (Şifre Değiştirme)
 
-Hash tek yönlüdür — eski hash'i "açıp" düzenleyemezsiniz. Güncelleme = **eski doğrulama + yeni hash oluşturma**:
+Hash tek yönlüdür — eski hash'i "açıp" düzenleyemezsin. Güncelleme = eski şifreyi doğrula + yeni hash oluştur.
 
 \`\`\`csharp
 public async Task<bool> ChangePassword(int userId, string currentPassword, string newPassword)
@@ -11765,8 +12641,7 @@ static string MaskEmail(string email)
 
 ## 41. Provider Uyumluluğu — SQL Server, PostgreSQL, Oracle, SQLite 📋
 
-> EF Core'un gücü **provider-agnostic** olmasıdır. Fluent API'nin %90'ı hangi veritabanı kullanılırsa kullanılsın aynıdır.  
-> Ancak bazı özellikler provider'a özgüdür — bunları bilmeden proje ortasında sürprizle karşılaşmak istenmeyen bir durum.
+EF Core'un Fluent API'sinin %90'ı provider-agnostic çalışır. Ancak bazı özellikler (Temporal Tables, JSON sütun syntax'ı, index tipleri) provider'a özgüdür. Bu bölüm hangi özelliğin nerede çalıştığını ve provider değiştirirken nelere dikkat edileceğini gösterir.
 
 ### Ortak (Tüm Provider'larda Çalışan) API
 
@@ -11924,8 +12799,7 @@ builder.ToTable(t => t.HasCharSet("utf8mb4"));
 
 ## 42. Custom Conventions — EF Core 7+ 📋
 
-> Convention, modeldeki **tüm entity'lere otomatik uygulanan kurallar**dır.  
-> "Her string property en fazla 256 karakter olsun", "Her tabloda CreatedAt olsun" gibi DRY kurallar convention ile yazılır.
+Modeldeki tüm entity'lere otomatik uygulanan kurallar. "Her string en fazla 256 karakter olsun", "Her tabloda CreatedAt shadow property olsun", "Her FK'ya index koy" gibi DRY kurallar bir kere yazılır, tüm entity'lere uygulanır — her config'te tekrar yazmaya gerek kalmaz.
 
 ### IModelFinalizingConvention — Tüm String'lere MaxLength
 
@@ -12044,6 +12918,8 @@ protected override void ConfigureConventions(ModelConfigurationBuilder configura
 
 ## 43. Data Annotations Hızlı Referans 📋
 
+Fluent API yerine attribute bazlı yapılandırma. Basit senaryolarda hızlıdır ama Fluent API kadar güçlü değildir (composite index, owned entity gibi şeyler attribute ile yapılamaz). İkisi birlikte kullanılabilir — Fluent API her zaman önceliklidir.
+
 \`\`\`csharp
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12134,7 +13010,7 @@ public class Category
 
 ## 44. Conventions Özetleri 📋
 
-> EF Core, model oluşturulurken bir dizi varsayılan convention uygular. Bunları bilmek, gereksiz konfigürasyon yazmaktan kurtarır.
+EF Core, model oluşturulurken varsayılan kurallar (conventions) uygular: Id → PK, int → IDENTITY, navigation property → FK, DbSet adı → tablo adı. Bunları bilmek gereksiz konfigürasyon yazmaktan kurtarır.
 
 ### EF Core Varsayılan Davranışları
 
@@ -12235,6 +13111,8 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
 
 ## 45. Hızlı Referans Tablosu 📋
 
+En sık kullanılan Fluent API metodları ve SQL karşılıkları — hızlıca bakıp kopyalamak için.
+
 | Metot | Kullanım | SQL Karşılığı |
 | --- | --- | --- |
 | \`ToTable("T")\` | Tablo adı | \`CREATE TABLE [T]\` |
@@ -12298,10 +13176,10 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
   <!-- Entity: Categories (top-left) -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.4s" fill="freeze"/>
-    <rect x="20" y="20" width="160" height="75" rx="4" fill="#1e293b" stroke="#6b8afd" stroke-width="1.5"/>
-    <rect x="20" y="20" width="160" height="22" rx="4" fill="#334155" stroke="#6b8afd" stroke-width="1.5"/>
+    <rect x="20" y="20" width="160" height="75" rx="4" fill="#1e293b" stroke="#7c8fb8" stroke-width="1.5"/>
+    <rect x="20" y="20" width="160" height="22" rx="4" fill="#334155" stroke="#7c8fb8" stroke-width="1.5"/>
     <text x="100" y="35" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="600">Categories</text>
-    <text x="30" y="55" fill="#fbbf24" font-size="8">🔑 int Id PK</text>
+    <text x="30" y="55" fill="#c4a44e" font-size="8">🔑 int Id PK</text>
     <text x="30" y="70" fill="#7dd3fc" font-size="8">nvarchar Name</text>
   </g>
 
@@ -12311,7 +13189,7 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
     <rect x="260" y="10" width="185" height="200" rx="4" fill="#1e293b" stroke="#34d399" stroke-width="1.5"/>
     <rect x="260" y="10" width="185" height="22" rx="4" fill="#334155" stroke="#34d399" stroke-width="1.5"/>
     <text x="352" y="25" text-anchor="middle" fill="#86efac" font-size="10" font-weight="600">Products</text>
-    <text x="270" y="45" fill="#fbbf24" font-size="7.5">🔑 int Id PK</text>
+    <text x="270" y="45" fill="#c4a44e" font-size="7.5">🔑 int Id PK</text>
     <text x="270" y="58" fill="#7dd3fc" font-size="7.5">nvarchar ProductName</text>
     <text x="270" y="71" fill="#7dd3fc" font-size="7.5">decimal Price</text>
     <text x="270" y="84" fill="#86efac" font-size="7.5">nvarchar Sku UK</text>
@@ -12332,7 +13210,7 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
     <rect x="20" y="300" width="170" height="90" rx="4" fill="#1e293b" stroke="#fb923c" stroke-width="1.5"/>
     <rect x="20" y="300" width="170" height="22" rx="4" fill="#334155" stroke="#fb923c" stroke-width="1.5"/>
     <text x="105" y="315" text-anchor="middle" fill="#fde68a" font-size="10" font-weight="600">Customers</text>
-    <text x="30" y="338" fill="#fbbf24" font-size="8">🔑 int Id PK</text>
+    <text x="30" y="338" fill="#c4a44e" font-size="8">🔑 int Id PK</text>
     <text x="30" y="354" fill="#7dd3fc" font-size="8">nvarchar FullName</text>
     <text x="30" y="370" fill="#7dd3fc" font-size="8">nvarchar Email</text>
   </g>
@@ -12343,7 +13221,7 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
     <rect x="280" y="290" width="175" height="105" rx="4" fill="#1e293b" stroke="#7dd3fc" stroke-width="1.5"/>
     <rect x="280" y="290" width="175" height="22" rx="4" fill="#334155" stroke="#7dd3fc" stroke-width="1.5"/>
     <text x="367" y="305" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="600">Orders</text>
-    <text x="290" y="328" fill="#fbbf24" font-size="8">🔑 int Id PK</text>
+    <text x="290" y="328" fill="#c4a44e" font-size="8">🔑 int Id PK</text>
     <text x="290" y="344" fill="#7dd3fc" font-size="8">nvarchar Reference</text>
     <text x="290" y="360" fill="#fb923c" font-size="8">int CustomerId FK</text>
     <text x="290" y="376" fill="#7dd3fc" font-size="8">datetime2 OrderDate</text>
@@ -12355,7 +13233,7 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
     <rect x="550" y="80" width="175" height="120" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
     <rect x="550" y="80" width="175" height="22" rx="4" fill="#334155" stroke="#475569" stroke-width="1.5"/>
     <text x="637" y="95" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="600">OrderLineItems</text>
-    <text x="560" y="118" fill="#fbbf24" font-size="8">🔑 int Id PK</text>
+    <text x="560" y="118" fill="#c4a44e" font-size="8">🔑 int Id PK</text>
     <text x="560" y="134" fill="#fb923c" font-size="8">int OrderId FK</text>
     <text x="560" y="150" fill="#fb923c" font-size="8">int ProductId FK</text>
     <text x="560" y="166" fill="#7dd3fc" font-size="8">int Quantity</text>
@@ -12365,10 +13243,10 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
   <!-- Entity: Payments (bottom-right) -->
   <g opacity="0">
     <animate attributeName="opacity" from="0" to="1" begin="1.7s" dur="0.4s" fill="freeze"/>
-    <rect x="560" y="320" width="185" height="105" rx="4" fill="#1e293b" stroke="#f87171" stroke-width="1.5"/>
-    <rect x="560" y="320" width="185" height="22" rx="4" fill="#334155" stroke="#f87171" stroke-width="1.5"/>
-    <text x="652" y="335" text-anchor="middle" fill="#f87171" font-size="10" font-weight="600">Payments</text>
-    <text x="570" y="358" fill="#fbbf24" font-size="8">🔑 int Id PK</text>
+    <rect x="560" y="320" width="185" height="105" rx="4" fill="#1e293b" stroke="#c76a6a" stroke-width="1.5"/>
+    <rect x="560" y="320" width="185" height="22" rx="4" fill="#334155" stroke="#c76a6a" stroke-width="1.5"/>
+    <text x="652" y="335" text-anchor="middle" fill="#c76a6a" font-size="10" font-weight="600">Payments</text>
+    <text x="570" y="358" fill="#c4a44e" font-size="8">🔑 int Id PK</text>
     <text x="570" y="374" fill="#7dd3fc" font-size="8">decimal Amount</text>
     <text x="570" y="390" fill="#fb923c" font-size="8">int OrderId FK</text>
     <text x="570" y="406" fill="#94a3b8" font-size="8">nvarchar PaymentType</text>
@@ -12422,7 +13300,7 @@ protected override void ConfigureConventions(ModelConfigurationBuilder config)
     <animate attributeName="opacity" from="0" to="1" begin="3.8s" dur="0.4s" fill="freeze"/>
     <rect x="20" y="445" width="400" height="65" rx="4" fill="#1e293b" stroke="#475569" stroke-width="0.8" stroke-dasharray="3,2"/>
     <text x="30" y="462" fill="#94a3b8" font-size="8" font-weight="600">Legend:</text>
-    <text x="30" y="478" fill="#fbbf24" font-size="7.5">🔑 PK = Primary Key</text>
+    <text x="30" y="478" fill="#c4a44e" font-size="7.5">🔑 PK = Primary Key</text>
     <text x="150" y="478" fill="#fb923c" font-size="7.5">FK = Foreign Key</text>
     <text x="270" y="478" fill="#86efac" font-size="7.5">UK = Unique</text>
     <text x="30" y="495" fill="#a5b4fc" font-size="7.5">Owned = Value Object</text>
