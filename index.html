@@ -896,7 +896,7 @@
     const MARKDOWN_CONTENT = `# EF Core Geliştirici El Kitabı
 
 > **Entity Framework Core 8 / 9 / 10** · Son güncelleme: Mayıs 2026  
-> .NET 8 / 9 / 10 uyumlu · SQL Server & PostgreSQL örnekleri · 45 bölüm · 205+ kod örneği
+> .NET 8 / 9 / 10 uyumlu · SQL Server & PostgreSQL örnekleri · 48 bölüm · 220+ kod örneği
 
 ---
 
@@ -1497,7 +1497,7 @@ builder.Ignore(p => p.IsInStock);         // Başka servisten gelen runtime değ
 // Precision & Scale (decimal için kısayol)
 builder.Property(p => p.Price).HasPrecision(18, 2);
 
-// 🆕 EF Core 10: Custom Default Constraint adları
+// 🆕 EF Core 10 (GA — .NET 10): Custom Default Constraint adları
 builder.Property(p => p.CreatedAt)
        .HasDefaultValueSql("GETUTCDATE()", "DF_Products_CreatedAt");  // İkinci parametre: constraint adı
 
@@ -2763,8 +2763,52 @@ steps:
 | \`--idempotent\` SQL script | Küçük-orta proje | 🟢 DBA review edebilir |
 | Migration Bundle (\`efbundle\`) | Otomatik deploy | 🟡 Hızlı ama review yok |
 | Manual SQL + MigrationHistory insert | Enterprise / DBA kontrolü | 🟢 Tam kontrol |
+| Expand-Contract (Zero-downtime) | Büyük production sistemi | 🟢 Downtime sıfır |
 
 > ⚠️ **Data Loss Uyarısı:** Sütun kaldırma/tip değiştirme migration'larında EF uyarı verir ama engellemez. Production'da her migration'ı **önce test ortamında** çalıştırılmalı.
+
+### Zero-Downtime Migration (Expand-Contract Pattern)
+
+Sütun rename veya kaldırma gibi breaking change'leri downtime olmadan yapmak için 2 adımlı deploy:
+
+\`\`\`
+Deploy 1 (Expand):
+  ─ Yeni sütunu EKLE (nullable, default ile)
+  ─ Kod hem eski hem yeni sütuna yazar (dual-write)
+  ─ Background job: eski veriyi yeni sütuna kopyalar
+
+Deploy 2 (Contract):
+  ─ Kod artık sadece yeni sütunu kullanır
+  ─ Eski sütunu DROP et (artık referans yok)
+\`\`\`
+
+\`\`\`csharp
+// Adım 1: Expand — yeni sütun ekle, eski duruyor
+migrationBuilder.AddColumn<string>("FullName", "Users", nullable: true);
+migrationBuilder.Sql("UPDATE Users SET FullName = FirstName + ' ' + LastName");
+
+// Adım 2: Contract (ayrı migration, ayrı deploy!)
+migrationBuilder.DropColumn("FirstName", "Users");
+migrationBuilder.DropColumn("LastName", "Users");
+\`\`\`
+
+> 💡 **Kural:** Bir migration'da hem ADD hem DROP yapma. Her biri ayrı deploy olmalı — arada kodun her iki sütunu da desteklediğinden emin ol.
+
+### Migration Geri Alma (Rollback)
+
+\`\`\`bash
+# Son migration'ı geri al (development)
+dotnet ef database update PreviousMigrationName
+
+# Migration dosyasını sil (henüz apply edilmemişse)
+dotnet ef migrations remove
+
+# Production'da rollback — Down() metodu çalışır:
+dotnet ef migrations script CurrentMigration PreviousMigration --idempotent -o rollback.sql
+# DBA bu script'i review edip çalıştırır
+\`\`\`
+
+> ⚠️ **Down() metodu güvenilir mi?** EF otomatik Down üretir ama veri kaybı olabilir (DROP COLUMN geri gelmez). Critical migration'larda Down()'ı her zaman manual kontrol et.
 
 ---
 
@@ -5066,7 +5110,7 @@ WHERE category_id = ANY(ARRAY[1, 3, 5]);
 
 </details>
 
-> 🆕 **EF Core 10 — Parameterized Collection iyileştirmesi:**
+> 🆕 **EF Core 10 (GA) — Parameterized Collection iyileştirmesi:**
 > \`\`\`csharp
 > int[] ids = [1, 2, 3];
 > var products = context.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
@@ -7525,7 +7569,7 @@ builder.HasQueryFilter(p => p.TenantId == _tenantId);  // ← Sadece bu geçerli
 EF Core 10 ile artık birden fazla **isimli** filter tanımlanabilir ve seçici olarak devre dışı bırakılabilir:
 
 \`\`\`csharp
-// 🆕 EF Core 10: İsimli query filter'lar
+// 🆕 EF Core 10 (GA — .NET 10): İsimli query filter'lar
 modelBuilder.Entity<Product>()
     .HasQueryFilter("SoftDelete", p => !p.IsDeleted)
     .HasQueryFilter("Tenant", p => p.TenantId == _tenantId);
@@ -9097,12 +9141,12 @@ WHERE price < 100.0;
 
 ---
 
-### ExecuteUpdateAsync — Dinamik Lambda 🆕 EF Core 10
+### ExecuteUpdateAsync — Dinamik Lambda 🆕 EF Core 10 (GA)
 
 EF Core 10 öncesinde \`ExecuteUpdateAsync\` bir expression tree kabul ediyordu — dinamik property güncellemesi çok zordu. Artık normal lambda destekleniyor:
 
 \`\`\`csharp
-// 🆕 EF Core 10: Normal lambda — koşullu property güncelleme
+// 🆕 EF Core 10 (GA): Normal lambda — koşullu property güncelleme
 await context.Products.ExecuteUpdateAsync(s =>
 {
     s.SetProperty(p => p.Views, 0);  // Her zaman sıfırla
@@ -9697,7 +9741,7 @@ WHERE o.shipping_address->>'City' = 'İstanbul';
 
 ---
 
-### 🆕 EF Core 10: ExecuteUpdate ile JSON Property Güncelleme
+### 🆕 EF Core 10 (GA): ExecuteUpdate ile JSON Property Güncelleme
 
 \`\`\`csharp
 // JSON içindeki tek bir alanı toplu güncelleme (Complex Type olarak map edilmişse):
@@ -11687,7 +11731,9 @@ var random = await context.Products
 
 ---
 
-### 🆕 EF Core 10: Vector Search (SQL Server 2025 / Azure SQL)
+### 🆕 EF Core 10 (GA): Vector Search (SQL Server 2025 / Azure SQL)
+
+> ⚠️ **Gereksinim:** SQL Server 2025 / Azure SQL + \`Microsoft.Data.SqlClient\` 6.0+ | PostgreSQL: \`pgvector\` extension
 
 AI ve semantic search senaryoları için **vektör veri tipi** ve **benzerlik araması** desteği:
 
@@ -12213,6 +12259,8 @@ public class AesEncryptionService : IEncryptionService
     public AesEncryptionService(IConfiguration config)
     {
         _key = Convert.FromBase64String(config["Encryption:Key"]!);
+        if (_key.Length != 32)
+            throw new ArgumentException("Encryption key must be 256 bits (32 bytes).");
     }
 
     public string Encrypt(string plainText)
@@ -12225,13 +12273,19 @@ public class AesEncryptionService : IEncryptionService
         var plainBytes = Encoding.UTF8.GetBytes(plainText);
         var cipherBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
         
-        // IV + CipherText birlikte saklanır
-        return Convert.ToBase64String(aes.IV.Concat(cipherBytes).ToArray());
+        // IV (16 byte) + CipherText birlikte saklanır
+        var result = new byte[aes.IV.Length + cipherBytes.Length];
+        Buffer.BlockCopy(aes.IV, 0, result, 0, aes.IV.Length);
+        Buffer.BlockCopy(cipherBytes, 0, result, aes.IV.Length, cipherBytes.Length);
+        return Convert.ToBase64String(result);
     }
 
     public string Decrypt(string cipherText)
     {
         var fullBytes = Convert.FromBase64String(cipherText);
+        if (fullBytes.Length < 17)  // IV(16) + en az 1 byte cipher
+            throw new CryptographicException("Invalid cipher text.");
+
         using var aes = Aes.Create();
         aes.Key = _key;
         aes.IV = fullBytes[..16];
@@ -12241,6 +12295,8 @@ public class AesEncryptionService : IEncryptionService
             decryptor.TransformFinalBlock(fullBytes, 16, fullBytes.Length - 16));
     }
 }
+// ⚠️ Production'da key yönetimi için Azure Key Vault veya AWS KMS kullanın.
+// Hardcoded key veya appsettings.json'da açık key ASLA production'a gitmesin.
 \`\`\`
 
 \`\`\`csharp
@@ -13450,7 +13506,369 @@ CREATE INDEX ix_products_category_id
 
 ---
 
-*Kaynak: [Microsoft EF Core Docs](https://learn.microsoft.com/ef/core/) · EF Core 8 & 9 What's New*
+---
+
+## 46. Testing & Integration Tests 🔴
+
+EF Core kullanan kodun test edilmesi — hangi yaklaşım ne zaman doğrudur, production veritabanı davranışını test ortamında nasıl garanti edersin.
+
+### Test Stratejileri Karşılaştırması
+
+| Yaklaşım | Doğruluk | Hız | Ne Zaman |
+|----------|:--------:|:---:|----------|
+| **In-Memory Provider** | 🔴 Düşük | ✅ Çok hızlı | ❌ Kullanma (kaldırılıyor) |
+| **SQLite In-Memory** | 🟡 Orta | ✅ Hızlı | Basit CRUD logic testi |
+| **Real DB (Testcontainers)** | 🟢 Yüksek | 🟡 Orta | ✅ **Önerilen** — production davranışı |
+| **Respawn** | 🟢 Yüksek | ✅ Hızlı reset | Transaction/data cleanup |
+
+> ⚠️ **InMemory Provider artık önerilmiyor** (EF Core 9'da deprecated uyarısı verir). Gerçek DB davranışını simüle edemez: transaction, constraint, raw SQL, computed column hiçbiri çalışmaz.
+
+### Testcontainers ile Integration Test
+
+\`\`\`csharp
+// NuGet: Testcontainers.MsSql veya Testcontainers.PostgreSql
+
+public class DatabaseFixture : IAsyncLifetime
+{
+    private readonly MsSqlContainer _container = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .Build();
+
+    public string ConnectionString => _container.GetConnectionString();
+
+    public async Task InitializeAsync()
+    {
+        await _container.StartAsync();
+
+        // Migration uygula
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlServer(ConnectionString)
+            .Options;
+
+        await using var context = new AppDbContext(options);
+        await context.Database.MigrateAsync();
+    }
+
+    public async Task DisposeAsync() => await _container.DisposeAsync();
+}
+
+// Test sınıfı
+public class ProductRepositoryTests : IClassFixture<DatabaseFixture>
+{
+    private readonly DatabaseFixture _fixture;
+
+    public ProductRepositoryTests(DatabaseFixture fixture) => _fixture = fixture;
+
+    private AppDbContext CreateContext()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlServer(_fixture.ConnectionString)
+            .Options;
+        return new AppDbContext(options);
+    }
+
+    [Fact]
+    public async Task AddProduct_SetsCreatedAtDefault()
+    {
+        await using var context = CreateContext();
+        var product = new Product { Name = "Test", Price = 99.99m, CategoryId = 1 };
+
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        Assert.True(product.CreatedAt > DateTime.MinValue); // DB default çalıştı
+    }
+}
+\`\`\`
+
+<details>
+<summary><b>🐘 PostgreSQL Testcontainers</b></summary>
+
+\`\`\`csharp
+private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
+    .WithImage("postgres:16-alpine")
+    .Build();
+
+public string ConnectionString => _container.GetConnectionString();
+\`\`\`
+
+</details>
+
+### Respawn ile Test Arası Data Cleanup
+
+\`\`\`csharp
+// NuGet: Respawn
+private Respawner _respawner = null!;
+
+public async Task InitializeAsync()
+{
+    await _container.StartAsync();
+    // ... migrate ...
+
+    _respawner = await Respawner.CreateAsync(ConnectionString, new RespawnerOptions
+    {
+        TablesToIgnore = new[] { new Table("__EFMigrationsHistory") },
+        DbAdapter = DbAdapter.SqlServer  // veya DbAdapter.Postgres
+    });
+}
+
+// Her test sonrası
+public async Task ResetDatabase() => await _respawner.ResetAsync(ConnectionString);
+\`\`\`
+
+### WebApplicationFactory ile API Integration Test
+
+\`\`\`csharp
+public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly HttpClient _client;
+
+    public ApiTests(WebApplicationFactory<Program> factory)
+    {
+        _client = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                // Production DB'yi test container ile değiştir
+                services.RemoveAll<DbContextOptions<AppDbContext>>();
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(TestConnectionString));
+            });
+        }).CreateClient();
+    }
+
+    [Fact]
+    public async Task GetProducts_ReturnsOk()
+    {
+        var response = await _client.GetAsync("/api/products");
+        response.EnsureSuccessStatusCode();
+    }
+}
+\`\`\`
+
+> 💡 **Test piramidi:** Unit test (repository logic, value objects) → Integration test (DB + EF) → API test (full stack). EF Core testlerinin çoğu **integration** seviyesinde olmalı.
+
+---
+
+## 47. Connection Resiliency 🔴
+
+Geçici bağlantı hataları (network glitch, Azure failover, connection pool exhaustion) production'da kaçınılmaz. EF Core'un retry mekanizması bu hataları otomatik tolere eder.
+
+### Yapılandırma
+
+<details>
+<summary><b>💾 SQL Server</b></summary>
+
+\`\`\`csharp
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,                          // Maks deneme
+            maxRetryDelay: TimeSpan.FromSeconds(30),   // Denemeler arası maks bekleme
+            errorNumbersToAdd: new[] { 4060, 4221 }); // Ek hata kodları
+    }));
+\`\`\`
+
+</details>
+
+<details open>
+<summary><b>🐘 PostgreSQL</b></summary>
+
+\`\`\`csharp
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: new[] { "57P01", "57P03" }); // admin_shutdown, cannot_connect_now
+    }));
+\`\`\`
+
+</details>
+
+### Execution Strategy ile Manuel Transaction
+
+> ⚠️ **Retry etkinken** kendi transaction'ınızı açıyorsanız, tüm bloğu \`ExecutionStrategy.ExecuteAsync\` içine sarmalısınız — aksi halde retry partial commit yapabilir!
+
+\`\`\`csharp
+// ❌ YANLIŞ — retry açıkken raw transaction kullanma
+using var transaction = await context.Database.BeginTransactionAsync();
+// ... retry tetiklenirse transaction zaten bozulmuş olur
+
+// ✅ DOĞRU — Execution Strategy ile sarmala
+var strategy = context.Database.CreateExecutionStrategy();
+
+await strategy.ExecuteAsync(async () =>
+{
+    await using var transaction = await context.Database.BeginTransactionAsync();
+
+    var order = new Order { CustomerId = 1, Reference = "ORD-001" };
+    context.Orders.Add(order);
+    await context.SaveChangesAsync();
+
+    order.Status = OrderStatus.Confirmed;
+    await context.SaveChangesAsync();
+
+    await transaction.CommitAsync();
+});
+\`\`\`
+
+### İdempotency Kuralları
+
+| Kural | Neden |
+|-------|-------|
+| Unique constraint + upsert | Retry aynı INSERT'i tekrar çalıştırabilir |
+| Idempotency key (request ID) | Aynı işlemin 2 kez uygulanmasını engeller |
+| SELECT before INSERT | Retry'da "zaten var" kontrolü |
+
+\`\`\`csharp
+// İdempotent kayıt oluşturma
+await strategy.ExecuteAsync(async () =>
+{
+    var exists = await context.Payments
+        .AnyAsync(p => p.IdempotencyKey == request.RequestId);
+
+    if (!exists)
+    {
+        context.Payments.Add(new Payment
+        {
+            IdempotencyKey = request.RequestId,
+            Amount = request.Amount,
+            OrderId = request.OrderId
+        });
+        await context.SaveChangesAsync();
+    }
+});
+\`\`\`
+
+### Retry Davranışı
+
+\`\`\`
+Deneme 1 → Hata (transient) → Bekle ~1s
+Deneme 2 → Hata (transient) → Bekle ~3s  (exponential backoff + jitter)
+Deneme 3 → Hata (transient) → Bekle ~7s
+Deneme 4 → Başarılı ✓
+\`\`\`
+
+> 💡 EF retry **sadece transient** hatalar için çalışır. Constraint violation, syntax error gibi kalıcı hatalar anında fırlatılır.
+
+---
+
+## 48. Diagnostics & Profiling 🔴
+
+Production'da sorguların ne kadar sürdüğünü, kaç sorgu çalıştığını ve N+1 problemlerini tespit etmek için EF Core diagnostics araçlarını kullan.
+
+### 1. EF Core Logging Levels
+
+\`\`\`csharp
+// Program.cs — Development'ta SQL göster
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString)
+           .LogTo(Console.WriteLine, LogLevel.Information)  // Sadece dev!
+           .EnableSensitiveDataLogging()                     // Parametre değerlerini göster
+           .EnableDetailedErrors());                         // Detaylı hata mesajları
+
+// Production: sadece warning ve üstü
+// appsettings.Production.json
+// "Logging": { "LogLevel": { "Microsoft.EntityFrameworkCore": "Warning" } }
+\`\`\`
+
+### 2. Query Tags — SQL'de İzlenebilirlik
+
+\`\`\`csharp
+var products = await context.Products
+    .TagWith("GetActiveProducts - ProductController.Index")
+    .TagWith($"UserId: {currentUser.Id}")
+    .Where(p => p.IsActive)
+    .ToListAsync();
+\`\`\`
+
+\`\`\`sql
+-- SQL Server Profiler / pg_stat_activity'de görürsün:
+-- GetActiveProducts - ProductController.Index
+-- UserId: 42
+
+SELECT [p].[Id], [p].[Name], [p].[Price]
+FROM [Products] AS [p]
+WHERE [p].[IsActive] = 1;
+\`\`\`
+
+### 3. ToQueryString() — Debug Aracı
+
+\`\`\`csharp
+// Query'yi çalıştırmadan SQL'ini gör (debug sırasında)
+var query = context.Products
+    .Where(p => p.Price > 100)
+    .OrderBy(p => p.Name);
+
+Console.WriteLine(query.ToQueryString());
+// Parametre değerleriyle birlikte tam SQL çıktısı verir
+\`\`\`
+
+### 4. OpenTelemetry Entegrasyonu
+
+\`\`\`csharp
+// NuGet: OpenTelemetry.Instrumentation.EntityFrameworkCore
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddEntityFrameworkCoreInstrumentation(options =>
+        {
+            options.SetDbStatementForText = true;  // SQL'i span'a ekle
+            options.SetDbStatementForStoredProcedure = true;
+        })
+        .AddSource("Microsoft.EntityFrameworkCore")
+        .AddConsoleExporter());  // veya Jaeger, Zipkin, OTLP
+\`\`\`
+
+### 5. N+1 Tespit — EF Core Event Counter
+
+\`\`\`csharp
+// DiagnosticListener ile N+1 tespiti
+public class EfQueryCountMiddleware
+{
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        var queryCount = 0;
+        var listener = context.RequestServices
+            .GetRequiredService<DiagnosticListener>();
+
+        // Her SQL komutu için sayaç artır
+        using var subscription = DiagnosticListener.AllListeners
+            .Subscribe(new QueryCountObserver(ref queryCount));
+
+        await next(context);
+
+        if (queryCount > 10)  // Threshold
+            Log.Warning("⚠️ N+1 şüphesi: {Path} → {Count} sorgu",
+                context.Request.Path, queryCount);
+    }
+}
+\`\`\`
+
+### Diagnostics Araçları Özet
+
+| Araç | Ne Yapar | Ortam |
+|------|----------|-------|
+| \`LogTo()\` | EF loglarını konsola yaz | Development |
+| \`TagWith()\` | SQL'e yorum ekle (izlenebilirlik) | Her ortam |
+| \`ToQueryString()\` | SQL'i çalıştırmadan gör | Debug |
+| OpenTelemetry | Distributed tracing, span'lar | Production |
+| MiniProfiler | Web UI'da sorgu sürelerini göster | Development/Staging |
+| \`dotnet-counters\` | EF runtime metrics | Production |
+
+---
+
+## Changelog
+
+| Versiyon | Tarih | Değişiklik |
+|----------|-------|------------|
+| v1.0 | Mayıs 2026 | İlk yayın — 48 bölüm, 220+ kod örneği |
+
+---
+
+*Kaynak: [Microsoft EF Core Docs](https://learn.microsoft.com/ef/core/) · EF Core 8 / 9 / 10 What's New*
 
 `;
     </script>
