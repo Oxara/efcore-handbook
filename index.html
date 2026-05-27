@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EF Core Geliştirici El Kitabı</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23512BD4'/><text x='16' y='23' font-family='Arial,sans-serif' font-size='14' font-weight='bold' fill='white' text-anchor='middle'>EF</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1016,6 +1017,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 </details>
 
+> 🚨 **Güvenlik — Connection String Yönetimi:**  
+> Yukarıdaki örneklerde şifreler doğrudan \`appsettings.json\` içinde gösterilmiştir — bu sadece **geliştirme ortamı** içindir. Production'da connection string'leri **asla** kaynak kodda veya config dosyasında saklamayın:
+> - **Development:** \`dotnet user-secrets set "ConnectionStrings:Default" "..."\`
+> - **Production:** Environment variable, Azure Key Vault veya AWS Secrets Manager kullanın
+> - \`appsettings.Development.json\` dosyasını \`.gitignore\`'a ekleyin
+
 ### DbContext Sınıfı
 
 \`\`\`csharp
@@ -1532,12 +1539,14 @@ public class Product
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public string Code { get; set; }
     public decimal Price { get; set; }
     public string Description { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
-    public string FullName { get; set; }  // computed
+    public string FullName { get; set; }  // computed: FirstName + ' ' + LastName
 }
 \`\`\`
 
