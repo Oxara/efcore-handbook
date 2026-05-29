@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://oxara.github.io/efcore-handbook/">
+    <img src="og-image.svg" alt="EF Core Geliştirici El Kitabı" width="100%" />
+  </a>
+</p>
+
 # EF Core Geliştirici El Kitabı
 
 **Kapsamlı Türkçe EF Core 8 / 9 / 10 referansı** — Temel'den uzman seviyeye, tek sayfada.
