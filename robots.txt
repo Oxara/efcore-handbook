@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://oxara.github.io/efcore-handbook/sitemap.xml
